@@ -1,4 +1,4 @@
-# Project youtube-voice-goi
+# Project youtube-voice-go
 
 One Paragraph of project description goes here
 

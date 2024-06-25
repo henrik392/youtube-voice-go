@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"youtube-voice-goi/cmd/web"
+	"github.com/henrik392/youtube-voice-go/cmd/web"
 
 	"github.com/a-h/templ"
 	"github.com/go-chi/chi/v5"

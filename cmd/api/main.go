@@ -2,7 +2,8 @@ package main
 
 import (
 	"fmt"
-	"youtube-voice-goi/internal/server"
+
+	"github.com/henrik392/youtube-voice-go/internal/server"
 )
 
 func main() {

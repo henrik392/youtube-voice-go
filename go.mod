@@ -1,4 +1,4 @@
-module youtube-voice-goi
+module github.com/henrik392/youtube-voice-go
 
 go 1.22.3
 

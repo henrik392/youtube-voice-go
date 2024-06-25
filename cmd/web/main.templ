@@ -16,7 +16,7 @@ templ MainPage() {
           type="submit"
           class="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >Generate Voice</button>
-          @DownloadButton("")
+        @DownloadButton("")
       </div>
     </form>
   </div>
@@ -59,10 +59,10 @@ templ DownloadButton(downloadUrl string) {
   <div id="download-button">
   if downloadUrl != "" {
     // Button is active, URL is provided
-    <a href={templ.URL(downloadUrl)} download class="rounded-md bg-green-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-green-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600 h-full">Download Voice</a>
+    <a href={templ.URL(downloadUrl)} download class="rounded-md bg-green-600 px-3.5 py-3 text-sm font-semibold text-white shadow-sm hover:bg-green-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600 h-full">Download Voice</a>
   } else {
     // Button is inactive, no URL provided
-    <div class="rounded-md bg-gray-400 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm h-full">Download Voice</div>
+    <a class="rounded-md bg-gray-400 px-3.5 py-3 text-sm font-semibold text-white shadow-sm h-full" onclick="return false;">Download Voice</a>
   }
   </div>
 }

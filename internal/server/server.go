@@ -9,7 +9,7 @@ import (
 
 	_ "github.com/joho/godotenv/autoload"
 
-	"youtube-voice-goi/internal/database"
+	"github.com/henrik392/youtube-voice-go/internal/database"
 )
 
 type Server struct {
