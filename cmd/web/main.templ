@@ -1,0 +1,49 @@
+package web
+
+templ MainPage() {
+	@Base() {
+  <div class="text-center">
+    <h1 class="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl">
+      Clone a Voice From a Youtube Video
+    </h1>
+    <div class="pt-20 text-start">
+      @URLInput(false, "")
+      <div class="mt-6">
+        <label for="price" class="block pl-4 text-sm font-bold leading-6 text-gray-900">Text to Speech</label>
+        <textarea name="url" id="url" class="block w-full rounded-md border-0 mt-1 pb-8 py-1.5 pl-4 pr-4 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" placeholder="Gegagedigedagedago..."></textarea>
+      </div>
+    </div>
+    <div class="flex items-center justify-center mt-10 gap-x-6">
+      <a
+        href="#"
+        class="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+        >Generate Voice</a>
+    </div>
+  </div>
+	}
+}
+
+func URLBorderColor(isValid bool) string {
+  if isValid {
+    return " border-2 border-green-500" 
+  }
+  return " border-2 border-red-500" 
+}
+
+templ URLInput(isValid bool, url string) {
+  <div id="url-input">
+    <label for="url" class="block pl-4 text-sm font-bold leading-6 text-gray-900">YouTube URL</label>
+    <div
+      class="relative mt-2 rounded-md shadow-sm"
+    >
+      <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+        <img class="w-auto h-4 opacity-70" src="https://cdn-icons-png.freepik.com/256/455/455691.png?semt=ais_hybrid" alt="" />
+      </div>
+      <input type="text" name="url" id="url"
+        class={"block w-full rounded-md  py-1.5 pl-9 pr-4 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" + URLBorderColor(isValid)}
+        placeholder="https://www.youtube.com/watch?v=..."
+        value={url}
+        hx-trigger="keyup changed delay:100ms" hx-post="/validate-url" hx-target="#url-input" hx-swap="outerHTML" />
+    </div>
+  </div>
+}
