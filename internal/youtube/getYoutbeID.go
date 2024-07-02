@@ -1,11 +1,11 @@
-package validation
+package youtube
 
 import (
 	"net/url"
 	"regexp"
 )
 
-func GetYoutubeIdFromURL(urlStr string) string {
+func GetYoutubeId(urlStr string) string {
 	parsedURL, err := url.Parse(urlStr)
 	if err != nil {
 		return ""

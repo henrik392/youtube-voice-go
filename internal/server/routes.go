@@ -2,6 +2,7 @@ package server
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/henrik392/youtube-voice-go/cmd/web"
@@ -22,6 +23,8 @@ func (s *Server) RegisterRoutes() http.Handler {
 	r.Get("/", templ.Handler(web.MainPage()).ServeHTTP)
 	r.Post("/validate-url", web.ValidateURLHandler)
 	r.Post("/generate-voice", web.GenerateVoiceHandler)
+
+	fmt.Println("Server started on port 8080")
 
 	return r
 }

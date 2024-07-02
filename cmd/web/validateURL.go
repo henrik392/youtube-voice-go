@@ -4,13 +4,13 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/henrik392/youtube-voice-go/internal/validation"
+	"github.com/henrik392/youtube-voice-go/internal/youtube"
 )
 
 func ValidateURLHandler(w http.ResponseWriter, r *http.Request) {
 	url := r.FormValue("url")
 
-	component := URLInput(validation.GetYoutubeIdFromURL(url) != "", url)
+	component := URLInput(youtube.GetYoutubeId(url) != "", url)
 	err := component.Render(r.Context(), w)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
