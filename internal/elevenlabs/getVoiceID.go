@@ -5,6 +5,8 @@ import (
 	"fmt"
 )
 
+const MAX_VOICES int = 10
+
 func (c *Client) GetVoiceID(youtubeID string) (string, error) {
 	if youtubeID == "" {
 		return "", fmt.Errorf("youtubeID is empty")
@@ -28,8 +30,9 @@ func (c *Client) GetVoiceID(youtubeID string) (string, error) {
 
 type VoicesResponse struct {
 	Voices []struct {
-		VoiceID string `json:"voice_id"`
-		Name    string `json:"name"`
+		VoiceID  string `json:"voice_id"`
+		Name     string `json:"name"`
+		Category string `json:"category"`
 	} `json:"voices"`
 }
 
@@ -53,10 +56,12 @@ func (c *Client) getVoices() ([]Voice, error) {
 
 	voices := make([]Voice, 0, len(response.Voices))
 	for _, voice := range response.Voices {
-		voices = append(voices, Voice{
-			VoiceID: voice.VoiceID,
-			Name:    voice.Name,
-		})
+		if voice.Category == "cloned" {
+			voices = append(voices, Voice{
+				VoiceID: voice.VoiceID,
+				Name:    voice.Name,
+			})
+		}
 	}
 
 	return voices, nil
@@ -84,13 +89,15 @@ func (c *Client) removeVoiceIfMaxReached() error {
 		return fmt.Errorf("failed to get voices: %v", err)
 	}
 
-	if len(voices) >= 10 {
+	if len(voices) >= MAX_VOICES {
 		voiceID := voices[0].VoiceID
 		err = c.removeVoice(voiceID)
 		if err != nil {
 			return fmt.Errorf("failed to remove voice: %v", err)
 		}
 	}
+
+	return nil
 }
 
 func (c *Client) removeVoice(voiceID string) error {
@@ -100,5 +107,6 @@ func (c *Client) removeVoice(voiceID string) error {
 		return fmt.Errorf("failed to delete voice: %v", err)
 	}
 
+	fmt.Printf("Voice %s removed\n", voiceID)
 	return nil
 }

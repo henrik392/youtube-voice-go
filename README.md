@@ -52,3 +52,7 @@ make clean
 
 1. yt-dlp
 2. tailwindcss
+
+## Limitations
+Max 10 minutes of video length and minimum 30 seconds. The ideal is between 1 and 5 minutes of clean audio.
+
