@@ -15,11 +15,11 @@ func (c *Client) GetVoiceID(youtubeID string) (string, error) {
 		return "", fmt.Errorf("failed to get saved voice ID: %v", err)
 	}
 
-	fmt.Println("Saved Voice ID:", voiceID)
-
 	if voiceID != "" {
 		return voiceID, nil
 	}
+
+	err = c.removeVoiceIfMaxReached()
 
 	return c.cloneVoice(youtubeID)
 
@@ -33,28 +33,72 @@ type VoicesResponse struct {
 	} `json:"voices"`
 }
 
-func (c *Client) getSavedVoiceID(youtubeID string) (string, error) {
+type Voice struct {
+	VoiceID string
+	Name    string
+}
+
+func (c *Client) getVoices() ([]Voice, error) {
 	endpoint := "voices"
 	body, err := c.getRequest(endpoint)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get voices: %v", err)
+	}
+
+	var response VoicesResponse
+	err = json.Unmarshal(body, &response)
+	if err != nil {
+		return nil, fmt.Errorf("failed to unmarshal response: %v", err)
+	}
+
+	voices := make([]Voice, 0, len(response.Voices))
+	for _, voice := range response.Voices {
+		voices = append(voices, Voice{
+			VoiceID: voice.VoiceID,
+			Name:    voice.Name,
+		})
+	}
+
+	return voices, nil
+}
+
+func (c *Client) getSavedVoiceID(youtubeID string) (string, error) {
+	voices, err := c.getVoices()
 	if err != nil {
 		return "", fmt.Errorf("failed to get voices: %v", err)
 	}
 
-	// Unmarshal the JSON response into the VoicesResponse struct
-	var response VoicesResponse
-	err = json.Unmarshal(body, &response)
-	if err != nil {
-		return "", fmt.Errorf("failed to unmarshal response: %v", err)
-	}
-
-	// Loop through the voices and return the voice ID if the name matches the youtube ID
-	for _, voice := range response.Voices {
-		fmt.Println("Voice Name:", voice.Name, "Youtube ID:", youtubeID)
+	for _, voice := range voices {
 		if voice.Name == youtubeID {
-			fmt.Println("Found Voice ID:", voice.VoiceID)
 			return voice.VoiceID, nil
 		}
 	}
 
 	return "", nil
+}
+
+func (c *Client) removeVoiceIfMaxReached() error {
+	voices, err := c.getVoices()
+
+	if err != nil {
+		return fmt.Errorf("failed to get voices: %v", err)
+	}
+
+	if len(voices) >= 10 {
+		voiceID := voices[0].VoiceID
+		err = c.removeVoice(voiceID)
+		if err != nil {
+			return fmt.Errorf("failed to remove voice: %v", err)
+		}
+	}
+}
+
+func (c *Client) removeVoice(voiceID string) error {
+	endpoint := fmt.Sprintf("voices/%s", voiceID)
+	_, err := c.deleteRequest(endpoint)
+	if err != nil {
+		return fmt.Errorf("failed to delete voice: %v", err)
+	}
+
+	return nil
 }

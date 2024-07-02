@@ -105,3 +105,31 @@ func (c *Client) getRequest(endpoint string) ([]byte, error) {
 
 	return body, nil
 }
+
+func (c *Client) deleteRequest(endpoint string) ([]byte, error) {
+	url := fmt.Sprintf("%s/%s", c.BaseURL, endpoint)
+	req, err := http.NewRequest("DELETE", url, nil)
+	if err != nil {
+		return nil, fmt.Errorf("error creating request: %w", err)
+	}
+
+	req.Header.Set("xi-api-key", c.APIKey)
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("error sending request: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("API request failed with status code: %d", resp.StatusCode)
+	}
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, fmt.Errorf("error reading response body: %w", err)
+	}
+
+	return body, nil
+}

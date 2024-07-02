@@ -55,6 +55,8 @@ func (c *Client) cloneVoice(youtubeID string) (string, error) {
 		return "", fmt.Errorf("failed to close writer: %v", err)
 	}
 
+	// Ready to add voice
+
 	endpoint := "voices/add"
 	contentType := writer.FormDataContentType()
 
