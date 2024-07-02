@@ -47,3 +47,8 @@ clean up binary from the last build
 ```bash
 make clean
 ```
+
+## Dependencies
+
+1. yt-dlp
+2. tailwindcss

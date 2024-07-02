@@ -31,6 +31,10 @@ docker-down:
 		docker-compose down; \
 	fi
 
+docker-build:
+	@echo "Building Docker image..."
+	@docker build -t yt-voice .
+
 # Test the application
 test:
 	@echo "Testing..."
