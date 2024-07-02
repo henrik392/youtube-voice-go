@@ -26,14 +26,14 @@ func GenerateVoiceHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Youtube ID:", youtubeID)
 
 	// Download the audio from the youtube video
-	// err, shouldReturn := downloadAndServeAudio(youtubeID, w, r)
-	// if shouldReturn {
-	// 	return
-	// }
+	err, shouldReturn := downloadAndServeAudio(youtubeID, w, r)
+	if shouldReturn {
+		return
+	}
 
 	elClient := elevenlabs.NewClient(os.Getenv("ELEVENLABS_API_KEY"))
 
-	voiceID, err := elevenlabs.GetVoiceId(youtubeID)
+	voiceID, err := elClient.GetVoiceID(youtubeID)
 	if err != nil {
 		log.Printf("Failed to get voice ID: %v", err)
 		http.Error(w, "Failed to get voice ID: "+err.Error(), http.StatusBadRequest)
@@ -70,15 +70,16 @@ func GenerateVoiceHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// func downloadAndServeAudio(youtubeID string, w http.ResponseWriter, r *http.Request) (error, bool) {
-// 	ytProcessor := youtube.NewProcessor("./downloads")
-// 	audioFile, err := ytProcessor.DownloadAudio(youtubeID)
+func downloadAndServeAudio(youtubeID string, w http.ResponseWriter, r *http.Request) (error, bool) {
+	ytProcessor := youtube.NewProcessor("./downloads")
+	audioFile, err := ytProcessor.DownloadAudio(youtubeID)
 
-// 	if err != nil {
-// 		http.Error(w, "Failed to process Youtube video: "+err.Error(), http.StatusBadRequest)
-// 		return nil, true
-// 	}
+	if err != nil {
+		http.Error(w, "Failed to process Youtube video: "+err.Error(), http.StatusBadRequest)
+		return nil, true
+	}
 
-// 	http.ServeFile(w, r, audioFile)
-// 	return err, false
-// }
+	fmt.Println("Downloaded audio file:", audioFile)
+
+	return err, false
+}

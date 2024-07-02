@@ -2,6 +2,7 @@ package elevenlabs
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"io"
 	"mime/multipart"
@@ -12,7 +13,7 @@ import (
 // CloneVoice clones a voice by uploading an audio to the elevenlabs API, a voice id is returned.
 // It takes a YouTube ID as input and returns the response from the server as a string (voice id).
 // If the YouTube ID is empty or if there is an error during the process, an error is returned.
-func (c *Client) CloneVoice(youtubeID string) (string, error) {
+func (c *Client) cloneVoice(youtubeID string) (string, error) {
 	if youtubeID == "" {
 		return "", fmt.Errorf("youtubeID is empty")
 	}
@@ -63,5 +64,14 @@ func (c *Client) CloneVoice(youtubeID string) (string, error) {
 		return "", fmt.Errorf("failed to post form data: %v", err)
 	}
 
-	return string(response), nil
+	// the resopnse is a JSON object with a 'voice_id' field like {"voice_id":"Yc8gJFBQEo23EEbwIFtd"}, return the voice id as a string
+	var voiceResponse struct {
+		VoiceID string `json:"voice_id"`
+	}
+	err = json.Unmarshal(response, &voiceResponse)
+	if err != nil {
+		return "", fmt.Errorf("failed to unmarshal response: %v", err)
+	}
+
+	return voiceResponse.VoiceID, nil
 }
