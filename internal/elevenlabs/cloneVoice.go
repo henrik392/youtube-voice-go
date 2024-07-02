@@ -28,7 +28,7 @@ func (c *Client) cloneVoice(youtubeID string) (string, error) {
 	var formData bytes.Buffer
 	writer := multipart.NewWriter(&formData)
 
-	// Add `name`
+	// Add `name` part
 	err = writer.WriteField("name", youtubeID)
 	if err != nil {
 		return "", fmt.Errorf("failed to write 'name' field: %v", err)
@@ -41,7 +41,6 @@ func (c *Client) cloneVoice(youtubeID string) (string, error) {
 	}
 	defer file.Close()
 
-	// Might create an error because it expects a list??
 	part, err := writer.CreateFormFile("files", filepath.Base(audioFilePath))
 	if err != nil {
 		return "", fmt.Errorf("failed to create form file: %v", err)

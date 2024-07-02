@@ -25,11 +25,17 @@ func GenerateVoiceHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Text:", text)
 	fmt.Println("Youtube ID:", youtubeID)
 
-	// Download the audio from the youtube video
-	err, shouldReturn := downloadAndServeAudio(youtubeID, w, r)
-	if shouldReturn {
+	ytProcessor := youtube.NewProcessor("./downloads")
+	audioFile, err := ytProcessor.DownloadAudio(youtubeID)
+
+	if err != nil {
+		http.Error(w, "Failed to process Youtube video: "+err.Error(), http.StatusBadRequest)
 		return
 	}
+
+	fmt.Println("Downloaded audio file:", audioFile)
+
+	// clone the voice
 
 	elClient := elevenlabs.NewClient(os.Getenv("ELEVENLABS_API_KEY"))
 
@@ -68,18 +74,4 @@ func GenerateVoiceHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 	}
-}
-
-func downloadAndServeAudio(youtubeID string, w http.ResponseWriter, r *http.Request) (error, bool) {
-	ytProcessor := youtube.NewProcessor("./downloads")
-	audioFile, err := ytProcessor.DownloadAudio(youtubeID)
-
-	if err != nil {
-		http.Error(w, "Failed to process Youtube video: "+err.Error(), http.StatusBadRequest)
-		return nil, true
-	}
-
-	fmt.Println("Downloaded audio file:", audioFile)
-
-	return err, false
 }
