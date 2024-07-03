@@ -5,7 +5,7 @@ import (
 	"regexp"
 )
 
-func GetYoutubeId(urlStr string) string {
+func GetYoutubeID(urlStr string) string {
 	parsedURL, err := url.Parse(urlStr)
 	if err != nil {
 		return ""

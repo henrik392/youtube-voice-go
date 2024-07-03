@@ -23,6 +23,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 	r.Get("/", templ.Handler(web.MainPage()).ServeHTTP)
 	r.Post("/validate-url", web.ValidateURLHandler)
 	r.Post("/generate-voice", web.GenerateVoiceHandler)
+	r.Get("/serve-audio", web.ServeAudioHandler)
 
 	fmt.Println("Server started on port 8080")
 

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"path/filepath"
 
@@ -17,11 +18,11 @@ func GenerateVoiceHandler(w http.ResponseWriter, r *http.Request) {
 	// 'text' is the text to be spoken
 	// 'url' is the youtube video url
 
-	url := r.FormValue("url")
+	youtubeURL := r.FormValue("url")
 	text := r.FormValue("text")
-	youtubeID := youtube.GetYoutubeId(url)
+	youtubeID := youtube.GetYoutubeID(youtubeURL)
 
-	fmt.Println("URL:", url)
+	fmt.Println("URL:", youtubeURL)
 	fmt.Println("Text:", text)
 	fmt.Println("Youtube ID:", youtubeID)
 
@@ -66,11 +67,13 @@ func GenerateVoiceHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Println("Saved speech!")
+	fmt.Println("Saved speech to file:", speechFilePath)
+	fmt.Println("Serving audio...")
 
-	downloadButton := DownloadButton(url)
+	audioURL := fmt.Sprintf("/serve-audio?path=%s", url.QueryEscape(speechFilePath))
 
-	err = downloadButton.Render(r.Context(), w)
+	audioPlayer := AudioPlayer(audioURL)
+	err = audioPlayer.Render(r.Context(), w)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 	}
