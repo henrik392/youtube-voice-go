@@ -2,6 +2,7 @@ package server
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"strconv"
@@ -19,13 +20,16 @@ type Server struct {
 }
 
 func NewServer() *http.Server {
-	port, _ := strconv.Atoi(os.Getenv("PORT"))
-	if port == 0 {
+	port, err := strconv.Atoi(os.Getenv("PORT"))
+	if err != nil || port == 0 {
 		port = 8080 // Default port
+		log.Printf("Using default port: %d", port)
+	} else {
+		log.Printf("Using PORT from environment: %d", port)
 	}
 	NewServer := &Server{
 		port: port,
-		db: database.New(),
+		db:   database.New(),
 	}
 
 	// Declare Server config

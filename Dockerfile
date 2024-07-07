@@ -10,6 +10,9 @@ RUN go mod download
 
 COPY . .
 
+ENV GOOS=linux
+ENV GOARCH=amd64
+
 RUN go build -o main cmd/api/main.go
 
 # Stage 2: Run the application
@@ -24,7 +27,7 @@ RUN mkdir -p /app/downloads
 # RUN chmod 777 /app/downloads
 
 COPY --from=builder /app/main .
-COPY --from=builder /app/.env .
+# COPY --from=builder /app/.env .
 # COPY static/ ./static/           # Copy static files if you have any
 
 EXPOSE 8080

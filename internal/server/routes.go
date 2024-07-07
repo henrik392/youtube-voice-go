@@ -1,10 +1,7 @@
 package server
 
 import (
-	"encoding/json"
-	"fmt"
 	"net/http"
-	"os"
 
 	"github.com/henrik392/youtube-voice-go/cmd/web"
 
@@ -26,12 +23,14 @@ func (s *Server) RegisterRoutes() http.Handler {
 	r.Post("/generate-voice", web.GenerateVoiceHandler)
 	r.Get("/serve-audio", web.ServeAudioHandler)
 
-	fmt.Println("Server started on port", os.Getenv("PORT"))
-
 	return r
 }
 
 func (s *Server) healthHandler(w http.ResponseWriter, r *http.Request) {
-	jsonResp, _ := json.Marshal(s.db.Health())
-	_, _ = w.Write(jsonResp)
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("OK"))
+
+	// For DB health check
+	// jsonResp, _ := json.Marshal(s.db.Health())
+	// _, _ = w.Write(jsonResp)
 }
