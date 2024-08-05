@@ -23,6 +23,10 @@ func (c *Client) GetVoiceID(youtubeID string) (string, error) {
 
 	err = c.removeVoiceIfMaxReached()
 
+	if err != nil {
+		return "", fmt.Errorf("failed to remove voice: %v", err)
+	}
+
 	return c.cloneVoice(youtubeID)
 
 	// return "4srV5pKnTwmwqQLucA8p", nil
