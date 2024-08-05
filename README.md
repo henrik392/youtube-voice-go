@@ -56,3 +56,9 @@ make clean
 ## Limitations
 Max 10 minutes of video length and minimum 30 seconds. The ideal is between 1 and 5 minutes of clean audio.
 
+## Deploy with gcluod
+
+```bash
+gcloud run deploy --image=europe-north1-docker.pkg.dev/youtube-to-voice/youtube-to-voice-repo/youtube-to-voice-image:tag1
+```
+
