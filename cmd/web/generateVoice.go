@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 
 	"github.com/google/uuid"
+	"github.com/henrik392/youtube-voice-go/cmd/web/components"
 	"github.com/henrik392/youtube-voice-go/internal/elevenlabs"
 	"github.com/henrik392/youtube-voice-go/internal/youtube"
 )
@@ -72,7 +73,7 @@ func GenerateVoiceHandler(w http.ResponseWriter, r *http.Request) {
 
 	audioURL := fmt.Sprintf("/serve-audio?path=%s", url.QueryEscape(speechFilePath))
 
-	audioPlayer := AudioPlayer(audioURL)
+	audioPlayer := components.AudioPlayer(audioURL)
 	err = audioPlayer.Render(r.Context(), w)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)

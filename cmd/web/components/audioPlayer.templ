@@ -1,0 +1,8 @@
+package components
+
+templ AudioPlayer(audioUrl string) {
+	<audio controls class="flex-grow" id="audio-player">
+		<source src={audioUrl} type="audio/mpeg"/>
+		Your browser does not support the audio element.
+	</audio>
+}
