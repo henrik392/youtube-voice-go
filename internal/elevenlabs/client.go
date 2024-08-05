@@ -38,7 +38,8 @@ func (c *Client) postJSON(endpoint string, payload []byte) ([]byte, error) {
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("API request failed with status code: %d", resp.StatusCode)
+		// fmt.Println(resp)
+		return nil, fmt.Errorf("API request failed with status code: %d\nBody: %s", resp.StatusCode, resp.Body)
 	}
 
 	body, err := io.ReadAll(resp.Body)
