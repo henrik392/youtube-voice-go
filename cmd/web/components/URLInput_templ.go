@@ -68,7 +68,7 @@ func URLInput(isValid bool, url string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" hx-trigger=\"keyup changed delay:100ms\" hx-post=\"/validate-url\" hx-target=\"#url-input\" hx-swap=\"outerHTML\"></div></div>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" hx-trigger=\"keyup changed delay:100ms\" hx-post=\"/validate-url\" hx-target=\"#url-input\" hx-swap=\"outerHTML\" hx-indicator=\"\"></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
