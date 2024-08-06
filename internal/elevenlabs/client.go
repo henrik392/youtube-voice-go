@@ -27,27 +27,9 @@ func (c *Client) postJSON(endpoint string, payload []byte) ([]byte, error) {
 		return nil, fmt.Errorf("error creating request: %w", err)
 	}
 
-	req.Header.Set("xi-api-key", c.APIKey)
 	req.Header.Set("Content-Type", "application/json")
 
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("error sending request: %w", err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		// fmt.Println(resp)
-		return nil, fmt.Errorf("API request failed with status code: %d\nBody: %s", resp.StatusCode, resp.Body)
-	}
-
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, fmt.Errorf("error reading response body: %w", err)
-	}
-
-	return body, nil
+	return c.doRequest(req)
 }
 
 func (c *Client) postFormData(endpoint string, formData *bytes.Buffer, contentType string) ([]byte, error) {
@@ -56,27 +38,9 @@ func (c *Client) postFormData(endpoint string, formData *bytes.Buffer, contentTy
 	if err != nil {
 		return nil, fmt.Errorf("error creating request: %w", err)
 	}
-
-	req.Header.Set("xi-api-key", c.APIKey)
 	req.Header.Set("Content-Type", contentType)
 
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("error sending request: %w", err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("API request failed with status code: %d", resp.StatusCode)
-	}
-
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, fmt.Errorf("error reading response body: %w", err)
-	}
-
-	return body, nil
+	return c.doRequest(req)
 }
 
 func (c *Client) getRequest(endpoint string) ([]byte, error) {
@@ -86,25 +50,7 @@ func (c *Client) getRequest(endpoint string) ([]byte, error) {
 		return nil, fmt.Errorf("error creating request: %w", err)
 	}
 
-	req.Header.Set("xi-api-key", c.APIKey)
-
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("error sending request: %w", err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("API request failed with status code: %d", resp.StatusCode)
-	}
-
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, fmt.Errorf("error reading response body: %w", err)
-	}
-
-	return body, nil
+	return c.doRequest(req)
 }
 
 func (c *Client) deleteRequest(endpoint string) ([]byte, error) {
@@ -114,22 +60,29 @@ func (c *Client) deleteRequest(endpoint string) ([]byte, error) {
 		return nil, fmt.Errorf("error creating request: %w", err)
 	}
 
+	return c.doRequest(req)
+}
+
+func (c *Client) doRequest(req *http.Request) ([]byte, error) {
 	req.Header.Set("xi-api-key", c.APIKey)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
+
 	if err != nil {
 		return nil, fmt.Errorf("error sending request: %w", err)
 	}
 	defer resp.Body.Close()
 
-	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("API request failed with status code: %d", resp.StatusCode)
-	}
-
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, fmt.Errorf("error reading response body: %w", err)
+	}
+
+	// ready body
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("API request failed with status code: %d", resp.StatusCode)
 	}
 
 	return body, nil
