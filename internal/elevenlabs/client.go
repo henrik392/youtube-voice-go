@@ -2,6 +2,7 @@ package elevenlabs
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -79,10 +80,18 @@ func (c *Client) doRequest(req *http.Request) ([]byte, error) {
 		return nil, fmt.Errorf("error reading response body: %w", err)
 	}
 
-	// ready body
-
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("API request failed with status code: %d", resp.StatusCode)
+		// unmarshalling the error body as json
+		var errorResponse struct {
+			Detail struct {
+				Status  string `json:"status"`
+				Message string `json:"message"`
+			} `json:"detail"`
+		}
+		if err := json.Unmarshal(body, &errorResponse); err != nil {
+			return nil, fmt.Errorf("API request failed with status code: %d\nBody: %s", resp.StatusCode, body)
+		}
+		return nil, fmt.Errorf("API request failed with status code: %d\nMessage: %s", resp.StatusCode, errorResponse.Detail.Message)
 	}
 
 	return body, nil
