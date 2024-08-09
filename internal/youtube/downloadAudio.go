@@ -29,6 +29,7 @@ func (p *Processor) DownloadAudio(youtubeID string) (string, error) {
 		"-x",
 		"--audio-format", "mp3",
 		"-o", outputFile,
+		"--postprocessor-args", "ffmpeg:-t 180", // Limit to max 3 minutes
 		youtubeID)
 
 	err := cmd.Run()
