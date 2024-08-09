@@ -31,7 +31,7 @@ func GenerateVoiceHandler(w http.ResponseWriter, r *http.Request) {
 	audioFile, err := ytProcessor.DownloadAudio(youtubeID)
 
 	if err != nil {
-		http.Error(w, "Failed to process Youtube video: "+err.Error(), http.StatusBadRequest)
+		serveError(w, r, "Failed to download audio: "+err.Error())
 		return
 	}
 
@@ -43,16 +43,14 @@ func GenerateVoiceHandler(w http.ResponseWriter, r *http.Request) {
 
 	voiceID, err := elClient.GetVoiceID(youtubeID)
 	if err != nil {
-		log.Printf("Failed to get voice ID: %v", err)
-		http.Error(w, "Failed to get voice ID: "+err.Error(), http.StatusBadRequest)
+		serveError(w, r, "Failed to clone voice: "+err.Error())
 		return
 	}
 
 	audioData, err := elClient.TextToSpeech(voiceID, text)
 	fmt.Println("Voice ID:", voiceID)
 	if err != nil {
-		log.Printf("Failed to generate voice: %v", err)
-		http.Error(w, "Failed to generate voice: "+err.Error(), http.StatusBadRequest)
+		serveError(w, r, "Failed to generate speech: "+err.Error())
 		return
 	}
 
@@ -63,8 +61,7 @@ func GenerateVoiceHandler(w http.ResponseWriter, r *http.Request) {
 	speechFilePath := filepath.Join("./downloads", fmt.Sprintf("%s_speech_%s.mp3", youtubeID, uuid.String()))
 	err = elClient.SaveAudioFile(audioData, speechFilePath)
 	if err != nil {
-		log.Printf("Failed to save generated speech: %v", err)
-		http.Error(w, "Failed to save generated speech", http.StatusInternalServerError)
+		serveError(w, r, "Failed to save speech to file: "+err.Error())
 		return
 	}
 
@@ -73,9 +70,18 @@ func GenerateVoiceHandler(w http.ResponseWriter, r *http.Request) {
 
 	audioURL := fmt.Sprintf("/serve-audio?path=%s", url.QueryEscape(speechFilePath))
 
-	audioPlayer := components.AudioPlayer(audioURL)
+	audioPlayer := components.AudioPlayer(audioURL, "")
 	err = audioPlayer.Render(r.Context(), w)
 	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+	}
+}
+
+func serveError(w http.ResponseWriter, r *http.Request, errorMessage string) {
+	log.Printf("Error: %v", errorMessage)
+	audioPlayer := components.AudioPlayer("", errorMessage)
+
+	if err := audioPlayer.Render(r.Context(), w); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 	}
 }

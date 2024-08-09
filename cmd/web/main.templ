@@ -24,10 +24,10 @@ templ MainPage() {
 						<p class="ml-2">Might take up to 20 seconds to generate speech.</p>
 					</div>
 				</div>
-				<div class="flex items-center justify-center mt-10 gap-x-6">
+				<div class="flex flex-col items-start justify-center mt-10 sm:flex-row gap-x-6 gap-y-3">
 					<button
 						type="submit"
-						class="rounded-md bg-indigo-600 flex-shrink-0 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+						class="sm:w-auto w-full rounded-lg bg-indigo-600 flex-shrink-0 px-3.5 h-10 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
 					>
 						Generate Voice
 						<span class="spinner htmx-indicator" id="spinner">
@@ -43,7 +43,7 @@ templ MainPage() {
 							</div>
 						</span>
 					</button>
-					@components.AudioPlayer("")
+					@components.AudioPlayer("", "")
 				</div>
 			</form>
 		</div>

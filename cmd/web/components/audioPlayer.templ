@@ -1,8 +1,18 @@
 package components
 
-templ AudioPlayer(audioUrl string) {
-	<audio controls class="flex-grow" id="audio-player">
-		<source src={audioUrl} type="audio/mpeg"/>
-		Your browser does not support the audio element.
-	</audio>
+templ AudioPlayer(audioUrl string, errorMessage string) {
+	<div class="flex-grow w-full" id="audio-player">
+		<audio controls class="w-full h-10">
+			<source src={ audioUrl } type="audio/mpeg"/>
+			Your browser does not support the audio element.
+		</audio>
+		if errorMessage != "" {
+			<div class="px-5 py-1 mt-4 text-left">
+				<details>
+					<summary class="font-bold text-red-500">Failed to generate speech.</summary>
+					<p class="pt-1 text-sm">{ errorMessage }</p>
+				</details>
+			</div>
+		}
+	</div>
 }
