@@ -16,7 +16,7 @@ func NewProcessor(outputDir string) *Processor {
 	}
 }
 
-func (p *Processor) DownloadAudio(youtubeID string) (string, error) {
+func (p *Processor) DownloadAudio(url, youtubeID string) (string, error) {
 	const EXT = "mp3"
 	outputFile := fmt.Sprintf("%s/%s.%s", p.OutputDir, youtubeID, EXT)
 
@@ -30,7 +30,7 @@ func (p *Processor) DownloadAudio(youtubeID string) (string, error) {
 		"--audio-format", "mp3",
 		"-o", outputFile,
 		"--postprocessor-args", "ffmpeg:-t 180", // Limit to max 3 minutes
-		youtubeID)
+		url)
 
 	err := cmd.Run()
 	if err != nil {

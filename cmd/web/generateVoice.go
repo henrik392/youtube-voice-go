@@ -28,7 +28,7 @@ func GenerateVoiceHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Youtube ID:", youtubeID)
 
 	ytProcessor := youtube.NewProcessor("./downloads")
-	audioFile, err := ytProcessor.DownloadAudio(youtubeID)
+	audioFile, err := ytProcessor.DownloadAudio(youtubeURL, youtubeID)
 
 	if err != nil {
 		serveError(w, r, "Failed to download audio: "+err.Error())
