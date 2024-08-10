@@ -11,7 +11,7 @@ import (
 func ValidateURLHandler(w http.ResponseWriter, r *http.Request) {
 	url := r.FormValue("url")
 
-	component := components.URLInput(youtube.GetYoutubeID(url) != "", url)
+	component := components.URLInput(youtube.ExtractVideoID(url) != "", url)
 	err := component.Render(r.Context(), w)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
