@@ -14,6 +14,9 @@ func ExtractVideoID(url string) string {
 			`tiktok\.com\/(?:@[\w.-]+\/video\/|v\/)(\d+)`,
 			`vm\.tiktok\.com\/(\w+)`,
 		},
+		"Instagram": {
+			`instagram\.com\/(?:reels?|p)\/([A-Za-z0-9_-]+)`,
+		},
 	}
 
 	// Can also check platform
