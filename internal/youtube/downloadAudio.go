@@ -16,9 +16,9 @@ func NewProcessor(outputDir string) *Processor {
 	}
 }
 
-func (p *Processor) DownloadAudio(url, youtubeID string) (string, error) {
+func (p *Processor) DownloadAudio(url, videoID string) (string, error) {
 	const EXT = "mp3"
-	outputFile := fmt.Sprintf("%s/%s.%s", p.OutputDir, youtubeID, EXT)
+	outputFile := fmt.Sprintf("%s/%s.%s", p.OutputDir, videoID, EXT)
 
 	// Return the file if it already exists
 	if _, err := os.Stat(outputFile); err == nil {

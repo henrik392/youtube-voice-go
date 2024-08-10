@@ -19,16 +19,16 @@ func GenerateVoiceHandler(w http.ResponseWriter, r *http.Request) {
 	// 'text' is the text to be spoken
 	// 'url' is the youtube video url
 
-	youtubeURL := r.FormValue("url")
+	videoURL := r.FormValue("url")
 	text := r.FormValue("text")
-	youtubeID := youtube.GetYoutubeID(youtubeURL)
+	videoID := youtube.ExtractVideoID(videoURL)
 
-	fmt.Println("URL:", youtubeURL)
+	fmt.Println("URL:", videoURL)
 	fmt.Println("Text:", text)
-	fmt.Println("Youtube ID:", youtubeID)
+	fmt.Println("Youtube ID:", videoID)
 
 	ytProcessor := youtube.NewProcessor("./downloads")
-	audioFile, err := ytProcessor.DownloadAudio(youtubeURL, youtubeID)
+	audioFile, err := ytProcessor.DownloadAudio(videoURL, videoID)
 
 	if err != nil {
 		serveError(w, r, "Failed to download audio: "+err.Error())
@@ -41,7 +41,7 @@ func GenerateVoiceHandler(w http.ResponseWriter, r *http.Request) {
 
 	elClient := elevenlabs.NewClient(os.Getenv("ELEVENLABS_API_KEY"))
 
-	voiceID, err := elClient.GetVoiceID(youtubeID)
+	voiceID, err := elClient.GetVoiceID(videoID)
 	if err != nil {
 		serveError(w, r, "Failed to clone voice: "+err.Error())
 		return
@@ -58,7 +58,7 @@ func GenerateVoiceHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Save the generated speech
 	uuid := uuid.New()
-	speechFilePath := filepath.Join("./downloads", fmt.Sprintf("%s_speech_%s.mp3", youtubeID, uuid.String()))
+	speechFilePath := filepath.Join("./downloads", fmt.Sprintf("%s_speech_%s.mp3", videoID, uuid.String()))
 	err = elClient.SaveAudioFile(audioData, speechFilePath)
 	if err != nil {
 		serveError(w, r, "Failed to save speech to file: "+err.Error())
