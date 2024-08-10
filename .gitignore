@@ -32,3 +32,5 @@ main
 downloads/
 
 vendor/
+
+.DS_Store
