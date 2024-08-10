@@ -40,7 +40,7 @@ func MainPage() templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"text-center\"><h1 class=\"text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl\">Clone Speech From a Youtube Video</h1><form hx-post=\"/generate-voice\" hx-target=\"#audio-player\" hx-swap=\"outerHTML\" hx-indicator=\"#spinner\"><div class=\"pt-20 text-start\">")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"text-center\"><h1 class=\"text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl\">Clone Speech From TikTok or YouTube</h1><form hx-post=\"/generate-voice\" hx-target=\"#audio-player\" hx-swap=\"outerHTML\" hx-indicator=\"#spinner\"><div class=\"pt-20 text-start\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
