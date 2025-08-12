@@ -1,64 +1,158 @@
-# Project youtube-voice-go
+# YouTube Voice Cloner
 
-One Paragraph of project description goes here
+Transform YouTube and TikTok videos into custom AI-generated speech using ElevenLabs voice synthesis technology.
 
-## Getting Started
+## What does it do?
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
+This application takes a YouTube or TikTok video URL and creates a new audio file with the same content but spoken in a different AI-generated voice. Here's how it works:
 
-## MakeFile
+1. **Download**: Extracts audio from YouTube/TikTok videos
+2. **Clone**: Creates a voice model from the original speaker
+3. **Convert**: Transcribes the audio to text
+4. **Synthesize**: Generates new speech using ElevenLabs AI voices
 
-run all make commands with clean tests
+## Features
+
+- ✅ **Multi-platform support**: YouTube and TikTok videos
+- ✅ **Voice cloning**: Creates custom voice models from source audio
+- ✅ **Web interface**: Simple, responsive UI built with HTMX
+- ✅ **Real-time processing**: See progress as your audio is generated
+- ✅ **Audio player**: Listen to results directly in the browser
+- ✅ **Docker deployment**: Ready for cloud deployment (Google Cloud Run)
+
+## Requirements
+
+### System Dependencies
+1. **yt-dlp** - Video/audio downloader
+   ```bash
+   # macOS
+   brew install yt-dlp
+   
+   # Ubuntu/Debian
+   sudo apt install yt-dlp
+   
+   # Or via pip
+   pip install yt-dlp
+   ```
+
+2. **TailwindCSS** - For building styles
+   ```bash
+   npm install -g tailwindcss
+   ```
+
+### Environment Variables
+Create a `.env` file with:
 ```bash
-make all build
+PORT=8080
+ELEVENLABS_API_KEY=your_api_key_here
+DATABASE_URL=your_postgres_connection_string
 ```
 
-build the application
+## Quick Start
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/henrik392/youtube-voice-go.git
+   cd youtube-voice-go
+   ```
+
+2. **Install dependencies**
+   ```bash
+   go mod download
+   ```
+
+3. **Build and run**
+   ```bash
+   make build
+   make run
+   ```
+
+4. **Open your browser**
+   Navigate to `http://localhost:8080`
+
+## Development Commands
+
 ```bash
+# Build the application (generates templates + CSS + binary)
 make build
-```
 
-run the application
-```bash
+# Run the application
 make run
-```
 
-Create DB container
-```bash
-make docker-run
-```
-
-Shutdown DB container
-```bash
-make docker-down
-```
-
-live reload the application
-```bash
+# Start with live reload (installs air if needed)
 make watch
-```
 
-run the test suite
-```bash
+# Run tests
 make test
-```
 
-clean up binary from the last build
-```bash
+# Start PostgreSQL database container
+make docker-run
+
+# Stop database container
+make docker-down
+
+# Clean build artifacts
 make clean
 ```
 
-## Dependencies
+## Video Limitations
 
-1. yt-dlp
-2. tailwindcss
+- **Length**: 30 seconds to 10 minutes
+- **Optimal**: 1-5 minutes with clear audio
+- **Format**: Supports any format that yt-dlp can process
 
-## Limitations
-Max 10 minutes of video length and minimum 30 seconds. The ideal is between 1 and 5 minutes of clean audio.
+## Architecture
 
-## Deploy with gcluod
+```
+cmd/
+├── api/           # Main application entry point
+└── web/           # Web handlers and templates
+internal/
+├── database/      # PostgreSQL integration
+├── elevenlabs/    # Voice synthesis API client
+├── server/        # HTTP server setup
+└── youtube/       # Video processing logic
+```
 
+## Technology Stack
+
+- **Backend**: Go with Chi router
+- **Frontend**: HTML templates (templ) + HTMX + TailwindCSS
+- **Database**: PostgreSQL
+- **Audio Processing**: yt-dlp + ffmpeg
+- **AI Voice**: ElevenLabs API
+
+## Deployment
+
+### Docker
+```bash
+make docker-build
+docker run -p 8080:8080 yt-voice
+```
+
+### Google Cloud Run
 ```bash
 gcloud run deploy --image=europe-north1-docker.pkg.dev/youtube-to-voice/youtube-to-voice-repo/youtube-to-voice-image:tag1
 ```
 
+## How It Works
+
+1. **URL Validation**: Checks if the provided URL is from YouTube or TikTok
+2. **Audio Extraction**: Downloads and converts video to MP3 (max 3 minutes)
+3. **Voice Analysis**: Analyzes the original speaker's voice characteristics
+4. **Voice Cloning**: Creates a custom voice model using ElevenLabs
+5. **Text Extraction**: Transcribes audio to text
+6. **Speech Synthesis**: Generates new audio with the cloned voice
+7. **Delivery**: Serves the final audio file through the web interface
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Run tests: `make test`
+5. Submit a pull request
+
+## License
+
+This project is for educational and personal use. Please respect content creators' rights and ElevenLabs' terms of service.
