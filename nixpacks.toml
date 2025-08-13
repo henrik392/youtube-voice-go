@@ -9,12 +9,13 @@ nixPkgs = ["go", "nodejs", "youtube-dl", "ffmpeg"]
 [phases.install]
 cmds = [
   "go mod download",
+  "go install github.com/a-h/templ/cmd/templ@latest",
   "npm install"
 ]
 
 [phases.build]
 cmds = [
-  "npx templ generate",
+  "templ generate",
   "npx tailwindcss -i cmd/web/assets/css/input.css -o cmd/web/assets/css/output.css",
   "go build -o out ./cmd/api"
 ]
