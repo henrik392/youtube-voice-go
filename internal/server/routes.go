@@ -20,7 +20,9 @@ func (s *Server) RegisterRoutes() http.Handler {
 	r.Handle("/assets/*", fileServer)
 	r.Get("/", templ.Handler(web.MainPage()).ServeHTTP)
 	r.Post("/validate-url", web.ValidateURLHandler)
+	r.Post("/process-video", web.ProcessVideoHandler)
 	r.Post("/generate-voice", web.GenerateVoiceHandler)
+	r.Post("/generate-voice-optimized", web.GenerateVoiceOptimizedHandler)
 	r.Get("/serve-audio", web.ServeAudioHandler)
 
 	return r
