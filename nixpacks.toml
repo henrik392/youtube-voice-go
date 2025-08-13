@@ -1,0 +1,23 @@
+[variables]
+# Set Go module path
+GO111MODULE = "on"
+CGO_ENABLED = "0"
+
+[phases.setup]
+nixPkgs = ["go", "nodejs", "youtube-dl", "ffmpeg"]
+
+[phases.install]
+cmds = [
+  "go mod download",
+  "npm install"
+]
+
+[phases.build]
+cmds = [
+  "npx templ generate",
+  "npx tailwindcss -i cmd/web/assets/css/input.css -o cmd/web/assets/css/output.css",
+  "go build -o out ./cmd/api"
+]
+
+[start]
+cmd = "./out"
