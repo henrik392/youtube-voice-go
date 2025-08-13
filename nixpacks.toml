@@ -4,13 +4,16 @@ GO111MODULE = "on"
 CGO_ENABLED = "0"
 
 [phases.setup]
-nixPkgs = ["go", "nodejs", "ffmpeg", "yt-dlp"]
+nixPkgs = ["...", "go", "nodejs"]
 
 [phases.install]
 cmds = [
   "go mod download",
   "go install github.com/a-h/templ/cmd/templ@latest",
-  "npm install"
+  "npm install",
+  "curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/local/bin/yt-dlp",
+  "chmod +x /usr/local/bin/yt-dlp",
+  "apt-get update && apt-get install -y ffmpeg"
 ]
 
 [phases.build]
@@ -21,4 +24,4 @@ cmds = [
 ]
 
 [start]
-cmd = "apt-get update && apt-get install -y yt-dlp ffmpeg && ./out"
+cmd = "./out"
