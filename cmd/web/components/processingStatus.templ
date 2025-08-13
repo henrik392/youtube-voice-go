@@ -10,7 +10,6 @@ templ ProcessingComplete(videoID, audioURL, refText string) {
 		</div>
 		<input type="hidden" name="video_id" value={ videoID }/>
 		<input type="hidden" name="audio_url" value={ audioURL }/>
-		<input type="hidden" name="ref_text" value={ refText }/>
 		<script>
 			// Switch form to use optimized endpoint
 			document.getElementById('voice-form').setAttribute('hx-post', '/generate-voice-optimized');

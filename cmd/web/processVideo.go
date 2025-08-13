@@ -67,18 +67,8 @@ func ProcessVideoHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Extract reference text using speech-to-text
-	log.Printf("Extracting reference text...")
-	refText, err := diaClient.ExtractReferenceTextFromURL(audioURL)
-	if err != nil {
-		log.Printf("Failed to extract reference text: %v", err)
-		component := components.ProcessingError("Failed to extract reference text: " + err.Error())
-		component.Render(r.Context(), w)
-		return
-	}
-
 	log.Printf("Video processing complete for %s", videoID)
 
-	component := components.ProcessingComplete(videoID, audioURL, refText)
+	component := components.ProcessingComplete(videoID, audioURL, "")
 	component.Render(r.Context(), w)
 }
