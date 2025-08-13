@@ -38,29 +38,33 @@ func GenerateVoiceHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Downloaded audio file:", audioFile)
 
 	// Create Dia TTS client
+	log.Printf("Creating Dia TTS client...")
 	diaClient := diatts.NewClient(os.Getenv("FAL_KEY"))
 
-	// Get base URL for serving reference audio
-	baseURL := fmt.Sprintf("http://%s", r.Host)
-	refAudioURL := diaClient.GenerateRefAudioURL(audioFile, baseURL)
-	
 	// Extract reference text from the audio (placeholder for now)
+	log.Printf("Extracting reference text...")
 	refText, err := diaClient.ExtractReferenceText(audioFile)
 	if err != nil {
+		log.Printf("Failed to extract reference text: %v", err)
 		serveError(w, r, "Failed to extract reference text: "+err.Error())
 		return
 	}
+	log.Printf("Reference text: %s", refText)
 
 	// Format the target text for Dia TTS (needs [S1] format)
 	formattedText := fmt.Sprintf("[S1] %s", text)
+	log.Printf("Formatted text: %s", formattedText)
 
-	// Generate speech using Dia TTS voice cloning
-	audioData, err := diaClient.VoiceClone(formattedText, refAudioURL, refText)
+	// Generate speech using Dia TTS voice cloning (uploadFile is called internally)
+	log.Printf("Starting voice cloning with Dia TTS...")
+	audioData, err := diaClient.VoiceClone(formattedText, audioFile, refText)
 	if err != nil {
+		log.Printf("Failed to generate speech: %v", err)
 		serveError(w, r, "Failed to generate speech: "+err.Error())
 		return
 	}
 
+	log.Printf("Generated speech successfully! Audio data size: %d bytes", len(audioData))
 	fmt.Println("Generated speech!")
 
 	// Save the generated speech
