@@ -73,9 +73,9 @@ type Response struct {
 func (c *Client) VoiceClone(prompt, refAudioFilePath string) ([]byte, error) {
 	log.Printf("Starting Zonos voice cloning for file: %s", refAudioFilePath)
 
-	// First crop the audio to 1 minute and re-encode to reduce size
-	log.Printf("Cropping and compressing audio to 1 minute...")
-	croppedFilePath, err := c.CropAndCompressAudio(refAudioFilePath, 60)
+	// First crop the audio to 30 seconds and re-encode to reduce size
+	log.Printf("Cropping and compressing audio to 30 seconds...")
+	croppedFilePath, err := c.CropAndCompressAudio(refAudioFilePath, 30)
 	if err != nil {
 		log.Printf("Error cropping audio: %v", err)
 		return nil, fmt.Errorf("error cropping audio: %w", err)

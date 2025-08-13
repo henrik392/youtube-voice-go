@@ -49,7 +49,7 @@ func ProcessVideoHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Crop, upload audio and extract reference text
 	log.Printf("Cropping and uploading audio...")
-	croppedFilePath, err := diaClient.CropAndCompressAudio(audioFile, 60)
+	croppedFilePath, err := diaClient.CropAndCompressAudio(audioFile, 30)
 	if err != nil {
 		log.Printf("Failed to crop audio: %v", err)
 		component := components.ProcessingError("Failed to crop audio: " + err.Error())
