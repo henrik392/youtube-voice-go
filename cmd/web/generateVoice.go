@@ -10,7 +10,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/henrik392/youtube-voice-go/cmd/web/components"
-	"github.com/henrik392/youtube-voice-go/internal/elevenlabs"
+	"github.com/henrik392/youtube-voice-go/internal/diatts"
 	"github.com/henrik392/youtube-voice-go/internal/youtube"
 )
 
@@ -37,29 +37,40 @@ func GenerateVoiceHandler(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Println("Downloaded audio file:", audioFile)
 
-	// clone the voice
+	// Create Dia TTS client
+	log.Printf("Creating Dia TTS client...")
+	diaClient := diatts.NewClient(os.Getenv("FAL_KEY"))
 
-	elClient := elevenlabs.NewClient(os.Getenv("ELEVENLABS_API_KEY"))
-
-	voiceID, err := elClient.GetVoiceID(videoID)
+	// Extract reference text from the audio (placeholder for now)
+	log.Printf("Extracting reference text...")
+	refText, err := diaClient.ExtractReferenceText(audioFile)
 	if err != nil {
-		serveError(w, r, "Failed to clone voice: "+err.Error())
+		log.Printf("Failed to extract reference text: %v", err)
+		serveError(w, r, "Failed to extract reference text: "+err.Error())
 		return
 	}
+	log.Printf("Reference text: %s", refText)
 
-	audioData, err := elClient.TextToSpeech(voiceID, text)
-	fmt.Println("Voice ID:", voiceID)
+	// Format the target text for Dia TTS (needs [S1] format)
+	formattedText := fmt.Sprintf("[S1] %s", text)
+	log.Printf("Formatted text: %s", formattedText)
+
+	// Generate speech using Dia TTS voice cloning (uploadFile is called internally)
+	log.Printf("Starting voice cloning with Dia TTS...")
+	audioData, err := diaClient.VoiceClone(formattedText, audioFile, refText)
 	if err != nil {
+		log.Printf("Failed to generate speech: %v", err)
 		serveError(w, r, "Failed to generate speech: "+err.Error())
 		return
 	}
 
+	log.Printf("Generated speech successfully! Audio data size: %d bytes", len(audioData))
 	fmt.Println("Generated speech!")
 
 	// Save the generated speech
 	uuid := uuid.New()
-	speechFilePath := filepath.Join("./downloads", fmt.Sprintf("%s_speech_%s.mp3", videoID, uuid.String()))
-	err = elClient.SaveAudioFile(audioData, speechFilePath)
+	speechFilePath := filepath.Join("./downloads", fmt.Sprintf("%s_speech_%s.wav", videoID, uuid.String()))
+	err = diaClient.SaveAudioFile(audioData, speechFilePath)
 	if err != nil {
 		serveError(w, r, "Failed to save speech to file: "+err.Error())
 		return
