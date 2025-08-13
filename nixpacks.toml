@@ -4,7 +4,7 @@ GO111MODULE = "on"
 CGO_ENABLED = "0"
 
 [phases.setup]
-nixPkgs = ["go", "nodejs", "yt-dlp", "ffmpeg"]
+nixPkgs = ["go", "nodejs", "ffmpeg", "yt-dlp"]
 
 [phases.install]
 cmds = [
