@@ -70,6 +70,16 @@ type Response struct {
 	} `json:"audio"`
 }
 
+type SpeechToTextRequest struct {
+	AudioURL string `json:"audio_url"`
+	UsePNC   bool   `json:"use_pnc"`
+}
+
+type SpeechToTextResponse struct {
+	Output  string `json:"output"`
+	Partial bool   `json:"partial"`
+}
+
 func (c *Client) VoiceClone(text, refAudioFilePath, refText string) ([]byte, error) {
 	log.Printf("Starting voice cloning for file: %s", refAudioFilePath)
 
@@ -172,9 +182,85 @@ func (c *Client) SaveAudioFile(audio []byte, filename string) error {
 }
 
 func (c *Client) ExtractReferenceText(audioFilePath string) (string, error) {
-	// TODO: Implement actual speech-to-text extraction
-	// For now, return a placeholder that matches the Dia TTS expected format
-	return "[S1] This is sample reference text extracted from the audio.", nil
+	log.Printf("Extracting reference text from audio file: %s", audioFilePath)
+
+	// First crop the audio to 15 seconds for consistency with TTS processing
+	log.Printf("Cropping audio for speech-to-text...")
+	croppedFilePath, err := c.cropAndCompressAudio(audioFilePath, 15)
+	if err != nil {
+		log.Printf("Error cropping audio for speech-to-text: %v", err)
+		return "", fmt.Errorf("error cropping audio for speech-to-text: %w", err)
+	}
+	defer os.Remove(croppedFilePath) // Clean up the temporary cropped file
+	log.Printf("Audio cropped for speech-to-text: %s", croppedFilePath)
+
+	// Upload cropped audio to S3 for speech-to-text API
+	audioURL, err := c.uploadToS3(croppedFilePath)
+	if err != nil {
+		log.Printf("Error uploading cropped audio for speech-to-text: %v", err)
+		return "", fmt.Errorf("error uploading cropped audio for speech-to-text: %w", err)
+	}
+	log.Printf("Cropped audio uploaded for speech-to-text: %s", audioURL)
+
+	// Prepare speech-to-text request
+	sttRequest := SpeechToTextRequest{
+		AudioURL: audioURL,
+		UsePNC:   true, // Enable punctuation and capitalization
+	}
+
+	jsonPayload, err := json.Marshal(sttRequest)
+	if err != nil {
+		log.Printf("Error marshalling speech-to-text payload: %v", err)
+		return "", fmt.Errorf("error marshalling speech-to-text payload: %w", err)
+	}
+
+	// Make request to FAL speech-to-text API
+	sttURL := "https://fal.run/fal-ai/speech-to-text/turbo"
+	log.Printf("Sending speech-to-text request to: %s", sttURL)
+
+	req, err := http.NewRequest("POST", sttURL, bytes.NewBuffer(jsonPayload))
+	if err != nil {
+		log.Printf("Error creating speech-to-text request: %v", err)
+		return "", fmt.Errorf("error creating speech-to-text request: %w", err)
+	}
+
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", fmt.Sprintf("Key %s", c.APIKey))
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Printf("Error sending speech-to-text request: %v", err)
+		return "", fmt.Errorf("error sending speech-to-text request: %w", err)
+	}
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		log.Printf("Error reading speech-to-text response: %v", err)
+		return "", fmt.Errorf("error reading speech-to-text response: %w", err)
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		log.Printf("Speech-to-text request failed with status: %d", resp.StatusCode)
+		log.Printf("Response body: %s", string(body))
+		return "", fmt.Errorf("speech-to-text request failed with status: %d, body: %s", resp.StatusCode, body)
+	}
+
+	// Parse speech-to-text response
+	var sttResponse SpeechToTextResponse
+	err = json.Unmarshal(body, &sttResponse)
+	if err != nil {
+		log.Printf("Error unmarshalling speech-to-text response: %v", err)
+		log.Printf("Response body: %s", string(body))
+		return "", fmt.Errorf("error unmarshalling speech-to-text response: %w", err)
+	}
+
+	// Format the transcribed text for Dia TTS (needs [S1] format)
+	formattedText := fmt.Sprintf("[S1] %s", sttResponse.Output)
+	log.Printf("Extracted reference text: %s", formattedText)
+
+	return formattedText, nil
 }
 
 func (c *Client) cropAndCompressAudio(inputPath string, durationSeconds int) (string, error) {
