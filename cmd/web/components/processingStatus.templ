@@ -1,16 +1,15 @@
 package components
 
-templ ProcessingComplete(videoID, audioURL, refText string) {
+templ ProcessingComplete(videoID, audioURL string) {
 	<div class="text-sm text-green-600">
 		<div class="flex items-center">
-			<svg class="mx-2 w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+			<svg class="mr-2 ml-3 w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
 			</svg>
 			Video processed successfully!
 		</div>
 		<input type="hidden" name="video_id" value={ videoID }/>
 		<input type="hidden" name="audio_url" value={ audioURL }/>
-		<input type="hidden" name="ref_text" value={ refText }/>
 		<script>
 			// Switch form to use optimized endpoint
 			document.getElementById('voice-form').setAttribute('hx-post', '/generate-voice-optimized');
@@ -21,7 +20,7 @@ templ ProcessingComplete(videoID, audioURL, refText string) {
 templ ProcessingError(errorMsg string) {
 	<div class="text-sm text-red-600">
 		<div class="flex items-center">
-			<svg class="mr-2 w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+			<svg class="mr-2 ml-3 w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
 			</svg>
 			Error: { errorMsg }
@@ -32,7 +31,7 @@ templ ProcessingError(errorMsg string) {
 templ ProcessingInProgress() {
 	<div class="text-sm text-blue-600">
 		<div class="flex items-center">
-			<svg class="mx-2 -ml-1 w-4 h-4 text-blue-600 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+			<svg class="mr-2 ml-3 w-4 h-4 text-blue-600 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
 				<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
 				<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
 			</svg>

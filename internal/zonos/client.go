@@ -1,4 +1,4 @@
-package diatts
+package zonos
 
 import (
 	"bytes"
@@ -36,7 +36,7 @@ func NewClient(apiKey string) *Client {
 	// Remove http:// or https:// from endpoint for minio client
 	endpoint := strings.TrimPrefix(s3Endpoint, "http://")
 	endpoint = strings.TrimPrefix(endpoint, "https://")
-	
+
 	// Determine if we should use HTTPS based on the original endpoint
 	useSSL := strings.HasPrefix(s3Endpoint, "https://")
 
@@ -51,7 +51,7 @@ func NewClient(apiKey string) *Client {
 
 	return &Client{
 		APIKey:     apiKey,
-		BaseURL:    "https://fal.run/fal-ai/dia-tts/voice-clone",
+		BaseURL:    "https://fal.run/fal-ai/zonos",
 		S3Client:   s3Client,
 		S3Bucket:   s3Bucket,
 		S3Endpoint: s3Endpoint,
@@ -59,9 +59,8 @@ func NewClient(apiKey string) *Client {
 }
 
 type Request struct {
-	Text         string `json:"text"`
-	RefAudioURL  string `json:"ref_audio_url"`
-	RefText      string `json:"ref_text"`
+	Prompt           string `json:"prompt"`
+	ReferenceAudioURL string `json:"reference_audio_url"`
 }
 
 type Response struct {
@@ -70,22 +69,13 @@ type Response struct {
 	} `json:"audio"`
 }
 
-type SpeechToTextRequest struct {
-	AudioURL string `json:"audio_url"`
-	UsePNC   bool   `json:"use_pnc"`
-}
 
-type SpeechToTextResponse struct {
-	Output  string `json:"output"`
-	Partial bool   `json:"partial"`
-}
+func (c *Client) VoiceClone(prompt, refAudioFilePath string) ([]byte, error) {
+	log.Printf("Starting Zonos voice cloning for file: %s", refAudioFilePath)
 
-func (c *Client) VoiceClone(text, refAudioFilePath, refText string) ([]byte, error) {
-	log.Printf("Starting voice cloning for file: %s", refAudioFilePath)
-
-	// First crop the audio to 15 seconds and re-encode to reduce size
-	log.Printf("Cropping and compressing audio to 15 seconds...")
-	croppedFilePath, err := c.CropAndCompressAudio(refAudioFilePath, 15)
+	// First crop the audio to 30 seconds and re-encode to reduce size
+	log.Printf("Cropping and compressing audio to 30 seconds...")
+	croppedFilePath, err := c.CropAndCompressAudio(refAudioFilePath, 30)
 	if err != nil {
 		log.Printf("Error cropping audio: %v", err)
 		return nil, fmt.Errorf("error cropping audio: %w", err)
@@ -103,9 +93,8 @@ func (c *Client) VoiceClone(text, refAudioFilePath, refText string) ([]byte, err
 	log.Printf("S3 URL created: %s", refAudioURL)
 
 	payload := Request{
-		Text:        text,
-		RefAudioURL: refAudioURL,
-		RefText:     refText,
+		Prompt:           prompt,
+		ReferenceAudioURL: refAudioURL,
 	}
 
 	log.Printf("Marshalling request payload...")
@@ -127,7 +116,7 @@ func (c *Client) VoiceClone(text, refAudioFilePath, refText string) ([]byte, err
 	req.Header.Set("Authorization", fmt.Sprintf("Key %s", c.APIKey))
 	log.Printf("Using API key: %s...", c.APIKey[:8]) // Log only first 8 chars for security
 
-	log.Printf("Sending request to Dia TTS API...")
+	log.Printf("Sending request to Zonos API...")
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
@@ -181,159 +170,14 @@ func (c *Client) SaveAudioFile(audio []byte, filename string) error {
 	return os.WriteFile(filename, audio, 0644)
 }
 
-func (c *Client) ExtractReferenceText(audioFilePath string) (string, error) {
-	log.Printf("Extracting reference text from audio file: %s", audioFilePath)
 
-	// First crop the audio to 15 seconds for consistency with TTS processing
-	log.Printf("Cropping audio for speech-to-text...")
-	croppedFilePath, err := c.CropAndCompressAudio(audioFilePath, 15)
-	if err != nil {
-		log.Printf("Error cropping audio for speech-to-text: %v", err)
-		return "", fmt.Errorf("error cropping audio for speech-to-text: %w", err)
-	}
-	defer os.Remove(croppedFilePath) // Clean up the temporary cropped file
-	log.Printf("Audio cropped for speech-to-text: %s", croppedFilePath)
 
-	// Upload cropped audio to S3 for speech-to-text API
-	audioURL, err := c.UploadToS3(croppedFilePath)
-	if err != nil {
-		log.Printf("Error uploading cropped audio for speech-to-text: %v", err)
-		return "", fmt.Errorf("error uploading cropped audio for speech-to-text: %w", err)
-	}
-	log.Printf("Cropped audio uploaded for speech-to-text: %s", audioURL)
-
-	// Prepare speech-to-text request
-	sttRequest := SpeechToTextRequest{
-		AudioURL: audioURL,
-		UsePNC:   true, // Enable punctuation and capitalization
-	}
-
-	jsonPayload, err := json.Marshal(sttRequest)
-	if err != nil {
-		log.Printf("Error marshalling speech-to-text payload: %v", err)
-		return "", fmt.Errorf("error marshalling speech-to-text payload: %w", err)
-	}
-
-	// Make request to FAL speech-to-text API
-	sttURL := "https://fal.run/fal-ai/speech-to-text/turbo"
-	log.Printf("Sending speech-to-text request to: %s", sttURL)
-
-	req, err := http.NewRequest("POST", sttURL, bytes.NewBuffer(jsonPayload))
-	if err != nil {
-		log.Printf("Error creating speech-to-text request: %v", err)
-		return "", fmt.Errorf("error creating speech-to-text request: %w", err)
-	}
-
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", fmt.Sprintf("Key %s", c.APIKey))
-
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		log.Printf("Error sending speech-to-text request: %v", err)
-		return "", fmt.Errorf("error sending speech-to-text request: %w", err)
-	}
-	defer resp.Body.Close()
-
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		log.Printf("Error reading speech-to-text response: %v", err)
-		return "", fmt.Errorf("error reading speech-to-text response: %w", err)
-	}
-
-	if resp.StatusCode != http.StatusOK {
-		log.Printf("Speech-to-text request failed with status: %d", resp.StatusCode)
-		log.Printf("Response body: %s", string(body))
-		return "", fmt.Errorf("speech-to-text request failed with status: %d, body: %s", resp.StatusCode, body)
-	}
-
-	// Parse speech-to-text response
-	var sttResponse SpeechToTextResponse
-	err = json.Unmarshal(body, &sttResponse)
-	if err != nil {
-		log.Printf("Error unmarshalling speech-to-text response: %v", err)
-		log.Printf("Response body: %s", string(body))
-		return "", fmt.Errorf("error unmarshalling speech-to-text response: %w", err)
-	}
-
-	// Format the transcribed text for Dia TTS (needs [S1] format)
-	formattedText := fmt.Sprintf("[S1] %s", sttResponse.Output)
-	log.Printf("Extracted reference text: %s", formattedText)
-
-	return formattedText, nil
-}
-
-func (c *Client) ExtractReferenceTextFromURL(audioURL string) (string, error) {
-	log.Printf("Extracting reference text from audio URL: %s", audioURL)
-
-	// Prepare speech-to-text request
-	sttRequest := SpeechToTextRequest{
-		AudioURL: audioURL,
-		UsePNC:   true, // Enable punctuation and capitalization
-	}
-
-	jsonPayload, err := json.Marshal(sttRequest)
-	if err != nil {
-		log.Printf("Error marshalling speech-to-text payload: %v", err)
-		return "", fmt.Errorf("error marshalling speech-to-text payload: %w", err)
-	}
-
-	// Make request to FAL speech-to-text API
-	sttURL := "https://fal.run/fal-ai/speech-to-text/turbo"
-	log.Printf("Sending speech-to-text request to: %s", sttURL)
-
-	req, err := http.NewRequest("POST", sttURL, bytes.NewBuffer(jsonPayload))
-	if err != nil {
-		log.Printf("Error creating speech-to-text request: %v", err)
-		return "", fmt.Errorf("error creating speech-to-text request: %w", err)
-	}
-
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", fmt.Sprintf("Key %s", c.APIKey))
-
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		log.Printf("Error sending speech-to-text request: %v", err)
-		return "", fmt.Errorf("error sending speech-to-text request: %w", err)
-	}
-	defer resp.Body.Close()
-
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		log.Printf("Error reading speech-to-text response: %v", err)
-		return "", fmt.Errorf("error reading speech-to-text response: %w", err)
-	}
-
-	if resp.StatusCode != http.StatusOK {
-		log.Printf("Speech-to-text request failed with status: %d", resp.StatusCode)
-		log.Printf("Response body: %s", string(body))
-		return "", fmt.Errorf("speech-to-text request failed with status: %d, body: %s", resp.StatusCode, body)
-	}
-
-	// Parse speech-to-text response
-	var sttResponse SpeechToTextResponse
-	err = json.Unmarshal(body, &sttResponse)
-	if err != nil {
-		log.Printf("Error unmarshalling speech-to-text response: %v", err)
-		log.Printf("Response body: %s", string(body))
-		return "", fmt.Errorf("error unmarshalling speech-to-text response: %w", err)
-	}
-
-	// Format the transcribed text for Dia TTS (needs [S1] format)
-	formattedText := fmt.Sprintf("[S1] %s", sttResponse.Output)
-	log.Printf("Extracted reference text from URL: %s", formattedText)
-
-	return formattedText, nil
-}
-
-func (c *Client) VoiceCloneWithURL(text, refAudioURL, refText string) ([]byte, error) {
-	log.Printf("Starting voice cloning with pre-processed URL: %s", refAudioURL)
+func (c *Client) VoiceCloneWithURL(prompt, refAudioURL string) ([]byte, error) {
+	log.Printf("Starting Zonos voice cloning with pre-processed URL: %s", refAudioURL)
 
 	payload := Request{
-		Text:        text,
-		RefAudioURL: refAudioURL,
-		RefText:     refText,
+		Prompt:           prompt,
+		ReferenceAudioURL: refAudioURL,
 	}
 
 	log.Printf("Marshalling request payload...")
@@ -355,7 +199,7 @@ func (c *Client) VoiceCloneWithURL(text, refAudioURL, refText string) ([]byte, e
 	req.Header.Set("Authorization", fmt.Sprintf("Key %s", c.APIKey))
 	log.Printf("Using API key: %s...", c.APIKey[:8])
 
-	log.Printf("Sending request to Dia TTS API...")
+	log.Printf("Sending request to Zonos API...")
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
@@ -400,14 +244,15 @@ func (c *Client) CropAndCompressAudio(inputPath string, durationSeconds int) (st
 
 	log.Printf("Cropping and compressing audio: %s -> %s (%d seconds)", inputPath, outputPath, durationSeconds)
 
-	// Use ffmpeg to crop and compress the audio
+	// Use ffmpeg to crop and compress the audio with better quality for voice cloning
 	cmd := exec.Command("ffmpeg",
 		"-i", inputPath,
 		"-t", fmt.Sprintf("%d", durationSeconds),
 		"-acodec", "mp3",        // Ensure MP3 encoding
-		"-ab", "64k",            // Lower bitrate for smaller file
-		"-ar", "22050",          // Lower sample rate
-		"-ac", "1",              // Mono channel
+		"-ab", "128k",           // Higher bitrate for better quality
+		"-ar", "44100",          // Standard sample rate for better quality
+		"-ac", "2",              // Stereo channel for better quality
+		"-q:a", "2",             // High quality setting (0-9, lower is better)
 		"-y",                    // Overwrite output file
 		outputPath)
 
