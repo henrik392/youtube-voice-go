@@ -9,7 +9,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/henrik392/youtube-voice-go/cmd/web/components"
-	"github.com/henrik392/youtube-voice-go/internal/diatts"
+	"github.com/henrik392/youtube-voice-go/internal/zonos"
 )
 
 func GenerateVoiceOptimizedHandler(w http.ResponseWriter, r *http.Request) {
@@ -28,7 +28,7 @@ func GenerateVoiceOptimizedHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Create Zonos client
-	diaClient := diatts.NewClient(os.Getenv("FAL_KEY"))
+	diaClient := zonos.NewClient(os.Getenv("FAL_KEY"))
 
 	// Generate speech using pre-processed audio URL
 	log.Printf("Starting voice cloning with Zonos using pre-processed data...")

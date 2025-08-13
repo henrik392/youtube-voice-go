@@ -11,7 +11,7 @@ This document outlines the migration from ElevenLabs voice cloning to Dia TTS vo
 ### Files Modified
 
 #### New Files
-- `internal/diatts/client.go` - New Dia TTS API client
+- `internal/zonos/client.go` - New Dia TTS API client
 
 #### Modified Files
 - `cmd/web/generateVoice.go` - Updated to use Dia TTS instead of ElevenLabs
@@ -90,7 +90,7 @@ func (c *Client) ExtractReferenceText(audioFilePath string) (string, error)
 If migration needs to be reversed:
 1. Revert `cmd/web/generateVoice.go` to use ElevenLabs
 2. Update environment variables back to `ELEVENLABS_API_KEY`
-3. Remove `internal/diatts/` directory
+3. Remove `internal/zonos/` directory
 4. Update README.md documentation
 
 ### Performance Considerations

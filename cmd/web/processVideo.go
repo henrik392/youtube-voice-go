@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"github.com/henrik392/youtube-voice-go/cmd/web/components"
-	"github.com/henrik392/youtube-voice-go/internal/diatts"
+	"github.com/henrik392/youtube-voice-go/internal/zonos"
 	"github.com/henrik392/youtube-voice-go/internal/youtube"
 )
 
@@ -45,11 +45,11 @@ func ProcessVideoHandler(w http.ResponseWriter, r *http.Request) {
 	log.Printf("Downloaded audio file: %s", audioFile)
 
 	// Create Dia TTS client
-	diaClient := diatts.NewClient(os.Getenv("FAL_KEY"))
+	diaClient := zonos.NewClient(os.Getenv("FAL_KEY"))
 
 	// Crop, upload audio and extract reference text
 	log.Printf("Cropping and uploading audio...")
-	croppedFilePath, err := diaClient.CropAndCompressAudio(audioFile, 15)
+	croppedFilePath, err := diaClient.CropAndCompressAudio(audioFile, 60)
 	if err != nil {
 		log.Printf("Failed to crop audio: %v", err)
 		component := components.ProcessingError("Failed to crop audio: " + err.Error())

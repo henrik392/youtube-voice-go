@@ -1,4 +1,4 @@
-package diatts
+package zonos
 
 import (
 	"bytes"
@@ -36,7 +36,7 @@ func NewClient(apiKey string) *Client {
 	// Remove http:// or https:// from endpoint for minio client
 	endpoint := strings.TrimPrefix(s3Endpoint, "http://")
 	endpoint = strings.TrimPrefix(endpoint, "https://")
-	
+
 	// Determine if we should use HTTPS based on the original endpoint
 	useSSL := strings.HasPrefix(s3Endpoint, "https://")
 
@@ -73,9 +73,9 @@ type Response struct {
 func (c *Client) VoiceClone(prompt, refAudioFilePath string) ([]byte, error) {
 	log.Printf("Starting Zonos voice cloning for file: %s", refAudioFilePath)
 
-	// First crop the audio to 15 seconds and re-encode to reduce size
-	log.Printf("Cropping and compressing audio to 15 seconds...")
-	croppedFilePath, err := c.CropAndCompressAudio(refAudioFilePath, 15)
+	// First crop the audio to 1 minute and re-encode to reduce size
+	log.Printf("Cropping and compressing audio to 1 minute...")
+	croppedFilePath, err := c.CropAndCompressAudio(refAudioFilePath, 60)
 	if err != nil {
 		log.Printf("Error cropping audio: %v", err)
 		return nil, fmt.Errorf("error cropping audio: %w", err)
