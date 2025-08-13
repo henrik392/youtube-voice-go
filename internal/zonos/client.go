@@ -244,14 +244,15 @@ func (c *Client) CropAndCompressAudio(inputPath string, durationSeconds int) (st
 
 	log.Printf("Cropping and compressing audio: %s -> %s (%d seconds)", inputPath, outputPath, durationSeconds)
 
-	// Use ffmpeg to crop and compress the audio
+	// Use ffmpeg to crop and compress the audio with better quality for voice cloning
 	cmd := exec.Command("ffmpeg",
 		"-i", inputPath,
 		"-t", fmt.Sprintf("%d", durationSeconds),
 		"-acodec", "mp3",        // Ensure MP3 encoding
-		"-ab", "64k",            // Lower bitrate for smaller file
-		"-ar", "22050",          // Lower sample rate
-		"-ac", "1",              // Mono channel
+		"-ab", "128k",           // Higher bitrate for better quality
+		"-ar", "44100",          // Standard sample rate for better quality
+		"-ac", "2",              // Stereo channel for better quality
+		"-q:a", "2",             // High quality setting (0-9, lower is better)
 		"-y",                    // Overwrite output file
 		outputPath)
 
