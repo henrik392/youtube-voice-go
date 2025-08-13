@@ -4,19 +4,12 @@ GO111MODULE = "on"
 CGO_ENABLED = "0"
 # Ensure binaries are in PATH
 PATH = "/usr/local/bin:/usr/bin:/bin"
+# Set timezone and locale
+TZ = "UTC"
+DEBIAN_FRONTEND = "noninteractive"
 
 [phases.setup]
 nixPkgs = ["...", "go", "nodejs"]
-cmds = [
-  "apt-get update",
-  "apt-get install -y --no-install-recommends ffmpeg curl",
-  "curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/local/bin/yt-dlp",
-  "chmod +x /usr/local/bin/yt-dlp",
-  "which ffmpeg",
-  "which yt-dlp",
-  "ffmpeg -version | head -n 1",
-  "yt-dlp --version"
-]
 
 [phases.install]
 cmds = [
@@ -33,4 +26,4 @@ cmds = [
 ]
 
 [start]
-cmd = "./out"
+cmd = "export DEBIAN_FRONTEND=noninteractive && apt-get update && apt-get install -y --no-install-recommends curl python3 xz-utils tzdata locales && echo 'UTC' > /etc/timezone && dpkg-reconfigure -f noninteractive tzdata && curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/local/bin/yt-dlp && chmod +x /usr/local/bin/yt-dlp && curl -L https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz -o /tmp/ffmpeg.tar.xz && tar -xf /tmp/ffmpeg.tar.xz -C /tmp && mv /tmp/ffmpeg-*-static/ffmpeg /usr/local/bin/ffmpeg && chmod +x /usr/local/bin/ffmpeg && rm -rf /tmp/ffmpeg* && ./out"
