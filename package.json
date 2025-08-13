@@ -1,0 +1,26 @@
+{
+  "name": "youtube-voice-go",
+  "version": "1.0.0",
+  "description": "Transform YouTube and TikTok videos into custom AI-generated speech using Dia TTS voice synthesis technology.",
+  "main": "tailwind.config.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/henrik392/youtube-voice-go.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/henrik392/youtube-voice-go/issues"
+  },
+  "homepage": "https://github.com/henrik392/youtube-voice-go#readme",
+  "devDependencies": {
+    "tailwindcss": "^3.4.17"
+  }
+}
