@@ -36,10 +36,13 @@ func NewClient(apiKey string) *Client {
 	// Remove http:// or https:// from endpoint for minio client
 	endpoint := strings.TrimPrefix(s3Endpoint, "http://")
 	endpoint = strings.TrimPrefix(endpoint, "https://")
+	
+	// Determine if we should use HTTPS based on the original endpoint
+	useSSL := strings.HasPrefix(s3Endpoint, "https://")
 
 	s3Client, err := minio.New(endpoint, &minio.Options{
 		Creds:  credentials.NewStaticV4(s3AccessKey, s3SecretKey, ""),
-		Secure: false, // Use HTTP for local MinIO
+		Secure: useSSL, // Use HTTPS for external endpoints
 	})
 	if err != nil {
 		log.Printf("Error creating S3 client: %v", err)
