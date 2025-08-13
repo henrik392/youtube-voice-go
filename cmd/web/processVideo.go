@@ -1,12 +1,11 @@
 package web
 
 import (
-	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 	"os"
 
+	"github.com/henrik392/youtube-voice-go/cmd/web/components"
 	"github.com/henrik392/youtube-voice-go/internal/diatts"
 	"github.com/henrik392/youtube-voice-go/internal/youtube"
 )
@@ -23,14 +22,11 @@ func ProcessVideoHandler(w http.ResponseWriter, r *http.Request) {
 	videoURL := r.FormValue("url")
 	videoID := youtube.ExtractVideoID(videoURL)
 
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Content-Type", "text/html")
 
 	if videoID == "" {
-		response := ProcessVideoResponse{
-			Success: false,
-			Error:   "Invalid YouTube URL",
-		}
-		json.NewEncoder(w).Encode(response)
+		component := components.ProcessingError("Invalid YouTube URL")
+		component.Render(r.Context(), w)
 		return
 	}
 
@@ -41,12 +37,8 @@ func ProcessVideoHandler(w http.ResponseWriter, r *http.Request) {
 	audioFile, err := ytProcessor.DownloadAudio(videoURL, videoID)
 	if err != nil {
 		log.Printf("Failed to download audio: %v", err)
-		response := ProcessVideoResponse{
-			Success: false,
-			VideoID: videoID,
-			Error:   "Failed to download audio: " + err.Error(),
-		}
-		json.NewEncoder(w).Encode(response)
+		component := components.ProcessingError("Failed to download audio: " + err.Error())
+		component.Render(r.Context(), w)
 		return
 	}
 
@@ -60,12 +52,8 @@ func ProcessVideoHandler(w http.ResponseWriter, r *http.Request) {
 	croppedFilePath, err := diaClient.CropAndCompressAudio(audioFile, 15)
 	if err != nil {
 		log.Printf("Failed to crop audio: %v", err)
-		response := ProcessVideoResponse{
-			Success: false,
-			VideoID: videoID,
-			Error:   "Failed to crop audio: " + err.Error(),
-		}
-		json.NewEncoder(w).Encode(response)
+		component := components.ProcessingError("Failed to crop audio: " + err.Error())
+		component.Render(r.Context(), w)
 		return
 	}
 	defer os.Remove(croppedFilePath) // Clean up temp file
@@ -74,12 +62,8 @@ func ProcessVideoHandler(w http.ResponseWriter, r *http.Request) {
 	audioURL, err := diaClient.UploadToS3(croppedFilePath)
 	if err != nil {
 		log.Printf("Failed to upload audio: %v", err)
-		response := ProcessVideoResponse{
-			Success: false,
-			VideoID: videoID,
-			Error:   "Failed to upload audio: " + err.Error(),
-		}
-		json.NewEncoder(w).Encode(response)
+		component := components.ProcessingError("Failed to upload audio: " + err.Error())
+		component.Render(r.Context(), w)
 		return
 	}
 
@@ -88,22 +72,13 @@ func ProcessVideoHandler(w http.ResponseWriter, r *http.Request) {
 	refText, err := diaClient.ExtractReferenceTextFromURL(audioURL)
 	if err != nil {
 		log.Printf("Failed to extract reference text: %v", err)
-		response := ProcessVideoResponse{
-			Success: false,
-			VideoID: videoID,
-			Error:   "Failed to extract reference text: " + err.Error(),
-		}
-		json.NewEncoder(w).Encode(response)
+		component := components.ProcessingError("Failed to extract reference text: " + err.Error())
+		component.Render(r.Context(), w)
 		return
 	}
 
 	log.Printf("Video processing complete for %s", videoID)
 
-	response := ProcessVideoResponse{
-		Success:  true,
-		VideoID:  videoID,
-		AudioURL: audioURL,
-		RefText:  refText,
-	}
-	json.NewEncoder(w).Encode(response)
+	component := components.ProcessingComplete(videoID, audioURL, refText)
+	component.Render(r.Context(), w)
 }

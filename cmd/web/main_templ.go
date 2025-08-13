@@ -43,7 +43,7 @@ func MainPage() templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"text-center\"><h1 class=\"text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl\">Clone Speech From TikTok, Instagram, or YouTube</h1><form hx-post=\"/generate-voice\" hx-target=\"#audio-player\" hx-swap=\"outerHTML\" hx-indicator=\"#spinner\"><div class=\"pt-20 text-start\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"text-center\"><h1 class=\"text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl\">Clone Speech From TikTok, Instagram, or YouTube</h1><form id=\"voice-form\" hx-post=\"/generate-voice\" hx-target=\"#audio-player\" hx-swap=\"outerHTML\" hx-indicator=\"#spinner\"><div class=\"pt-20 text-start\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
