@@ -69,6 +69,6 @@ func ProcessVideoHandler(w http.ResponseWriter, r *http.Request) {
 
 	log.Printf("Video processing complete for %s", videoID)
 
-	component := components.ProcessingComplete(videoID, audioURL, "")
+	component := components.ProcessingComplete(videoID, audioURL)
 	component.Render(r.Context(), w)
 }

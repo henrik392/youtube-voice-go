@@ -2,7 +2,69 @@ package components
 
 templ TextAreaToSpeech() {
 	<div class="mt-6">
-		<label for="text" class="block pl-4 text-sm font-bold leading-6 text-gray-900">Text to Speech</label>
-		<textarea name="text" id="text" class="block w-full rounded-md border-0 mt-1 pb-8 py-1.5 pl-4 pr-4 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" placeholder="Gegagedigedagedago..."></textarea>
+		<div class="flex justify-between items-center mb-1">
+			<label for="text" class="block pl-4 text-sm font-bold leading-6 text-gray-900">Text to Speech</label>
+			<div class="text-sm text-gray-500 mr-4">
+				<span id="char-count">0</span>/500
+			</div>
+		</div>
+		<div class="relative">
+			<textarea 
+				name="text" 
+				id="text" 
+				maxlength="500"
+				class="block w-full rounded-md border-0 mt-1 pb-8 py-1.5 pl-4 pr-4 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" 
+				placeholder="Enter text to convert to speech (max 500 characters)..."
+				oninput="updateCharCount(this)"
+			></textarea>
+			<div 
+				id="char-limit-warning" 
+				class="hidden mt-2 p-3 bg-amber-50 border border-amber-200 rounded-md"
+			>
+				<div class="flex items-center">
+					<svg class="w-5 h-5 text-amber-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
+						<path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+					</svg>
+					<span class="text-amber-800 text-sm font-medium">
+						Character limit reached! Please keep your text under 500 characters for optimal voice quality.
+					</span>
+				</div>
+			</div>
+		</div>
+		<script>
+			function updateCharCount(textarea) {
+				const currentLength = textarea.value.length;
+				const charCountElement = document.getElementById('char-count');
+				const warningElement = document.getElementById('char-limit-warning');
+				
+				charCountElement.textContent = currentLength;
+				
+				// Update color based on character count
+				if (currentLength >= 500) {
+					charCountElement.className = 'text-red-600 font-semibold';
+					warningElement.classList.remove('hidden');
+					textarea.classList.add('ring-red-300', 'focus:ring-red-500');
+					textarea.classList.remove('ring-gray-300', 'focus:ring-indigo-600');
+				} else if (currentLength >= 450) {
+					charCountElement.className = 'text-amber-600 font-semibold';
+					warningElement.classList.add('hidden');
+					textarea.classList.remove('ring-red-300', 'focus:ring-red-500', 'ring-gray-300', 'focus:ring-indigo-600');
+					textarea.classList.add('ring-amber-300', 'focus:ring-amber-500');
+				} else {
+					charCountElement.className = 'text-gray-500';
+					warningElement.classList.add('hidden');
+					textarea.classList.remove('ring-red-300', 'focus:ring-red-500', 'ring-amber-300', 'focus:ring-amber-500');
+					textarea.classList.add('ring-gray-300', 'focus:ring-indigo-600');
+				}
+			}
+			
+			// Initialize character count on page load
+			document.addEventListener('DOMContentLoaded', function() {
+				const textarea = document.getElementById('text');
+				if (textarea) {
+					updateCharCount(textarea);
+				}
+			});
+		</script>
 	</div>
 }
