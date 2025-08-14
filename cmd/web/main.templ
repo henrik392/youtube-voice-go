@@ -14,20 +14,21 @@ templ MainPage() {
 				</p>
 			</div>
 			
-			<form id="voice-form" hx-post="/generate-voice-enhanced" hx-target="#audio-player" hx-swap="outerHTML" hx-indicator="#voice-generation-loading">
-				<!-- Audio Input Mode Selector -->
-				@components.AudioInputModeSelector()
-				
-				<!-- Dynamic Audio Input Container -->
-				<div id="audio-input-container" class="mb-8">
-					<!-- This will be populated by JavaScript based on selected mode -->
-				</div>
-				
-				<!-- Text to Speech Section -->
-				<div class="text-start">
-					@components.TextAreaToSpeech()
-					<!-- Tips Section -->
-					<div class="mt-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg">
+			<div class="max-w-3xl mx-auto">
+				<form id="voice-form" hx-post="/generate-voice-enhanced" hx-target="#audio-player" hx-swap="outerHTML" hx-indicator="#voice-generation-loading">
+					<!-- Audio Input Mode Selector -->
+					@components.AudioInputModeSelector()
+					
+					<!-- Dynamic Audio Input Container -->
+					<div id="audio-input-container" class="mb-8">
+						<!-- This will be populated by JavaScript based on selected mode -->
+					</div>
+					
+					<!-- Text to Speech Section -->
+					<div class="text-start">
+						@components.TextAreaToSpeech()
+						<!-- Tips Section -->
+						<div class="mt-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg">
 						<div class="flex items-start space-x-3">
 							<svg class="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
 								<path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
@@ -43,14 +44,14 @@ templ MainPage() {
 							</div>
 						</div>
 					</div>
-				</div>
-				<div class="flex flex-col items-center justify-center space-y-4 mt-8 w-full">
-					<button
-						type="submit"
-						class="relative flex items-center justify-center px-8 py-3 text-base font-semibold text-white bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl shadow-lg hover:from-indigo-500 hover:to-purple-500 transform hover:scale-105 transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:hover:from-indigo-600 disabled:hover:to-purple-600 disabled:shadow-none"
-						id="generate-button"
-						disabled
-					>
+					</div>
+					<div class="flex flex-col items-center justify-center space-y-4 mt-8 w-full">
+						<button
+							type="submit"
+							class="relative flex items-center justify-center px-8 py-3 text-base font-semibold text-white bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl shadow-lg hover:from-indigo-500 hover:to-purple-500 transform hover:scale-105 transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none disabled:hover:from-indigo-600 disabled:hover:to-purple-600 disabled:shadow-none"
+							id="generate-button"
+							disabled
+						>
 						<!-- Default Icon -->
 						<svg class="w-5 h-5 mr-2 transition-opacity duration-200" id="voice-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 14.142M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/>
@@ -64,13 +65,14 @@ templ MainPage() {
 						
 						<span class="generate-text transition-opacity duration-200">Generate Voice Clone</span>
 						
-						<!-- Pulse Effect when Loading -->
-						<div class="absolute inset-0 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl opacity-0 animate-pulse" id="button-pulse"></div>
+						<!-- Subtle Pulse Effect when Loading -->
+						<div class="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-xl opacity-0" id="button-pulse"></div>
 					</button>
 					
 					@components.AudioPlayer("", "")
-				</div>
-			</form>
+					</div>
+				</form>
+			</div>
 			
 			<!-- Loading Animation -->
 			@components.LoadingAnimation()
@@ -92,11 +94,15 @@ templ MainPage() {
 				button.disabled = !isValid;
 				
 				if (isValid) {
-					button.classList.remove('opacity-50');
+					button.classList.remove('opacity-60');
 					button.classList.add('hover:scale-105');
+					// Ensure text stays white when active
+					button.classList.add('text-white');
 				} else {
-					button.classList.add('opacity-50');
+					button.classList.add('opacity-60');
 					button.classList.remove('hover:scale-105');
+					// Keep text white even when disabled
+					button.classList.add('text-white');
 				}
 			}
 
@@ -262,6 +268,7 @@ templ MainPage() {
 				voiceIcon.classList.add('hidden');
 				loadingIcon.classList.remove('hidden');
 				buttonPulse.classList.remove('opacity-0');
+				buttonPulse.classList.add('button-pulse-subtle');
 				
 				// Show the loading animation
 				if (window.showVoiceGenerationLoading) {
@@ -302,6 +309,7 @@ templ MainPage() {
 				voiceIcon.classList.remove('hidden');
 				loadingIcon.classList.add('hidden');
 				buttonPulse.classList.add('opacity-0');
+				buttonPulse.classList.remove('button-pulse-subtle');
 				
 				// Re-validate to set correct disabled state
 				updateButtonState();

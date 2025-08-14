@@ -888,6 +888,10 @@ video {
   max-width: 42rem;
 }
 
+.max-w-3xl {
+  max-width: 48rem;
+}
+
 .max-w-4xl {
   max-width: 56rem;
 }
@@ -1256,6 +1260,12 @@ video {
   --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
 }
 
+.from-indigo-500 {
+  --tw-gradient-from: #6366f1 var(--tw-gradient-from-position);
+  --tw-gradient-to: rgb(99 102 241 / 0) var(--tw-gradient-to-position);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+}
+
 .from-indigo-600 {
   --tw-gradient-from: #4f46e5 var(--tw-gradient-from-position);
   --tw-gradient-to: rgb(79 70 229 / 0) var(--tw-gradient-to-position);
@@ -1304,6 +1314,10 @@ video {
 
 .to-pink-500 {
   --tw-gradient-to: #ec4899 var(--tw-gradient-to-position);
+}
+
+.to-purple-500 {
+  --tw-gradient-to: #a855f7 var(--tw-gradient-to-position);
 }
 
 .to-purple-600 {
@@ -1599,8 +1613,8 @@ video {
   opacity: 0.3;
 }
 
-.opacity-50 {
-  opacity: 0.5;
+.opacity-60 {
+  opacity: 0.6;
 }
 
 .opacity-70 {
@@ -1808,6 +1822,24 @@ video {
 
 .gradient-button:active {
   transform: translateY(0);
+}
+
+/* Subtle button pulse effect */
+
+.button-pulse-subtle {
+  animation: subtle-pulse 2.5s ease-in-out infinite;
+}
+
+@keyframes subtle-pulse {
+  0%, 100% {
+    opacity: 0.1;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.2;
+    transform: scale(1.01);
+  }
 }
 
 /* Custom scrollbar for audio elements */
@@ -2039,8 +2071,8 @@ audio::-webkit-media-controls-panel {
   cursor: not-allowed;
 }
 
-.disabled\:opacity-50:disabled {
-  opacity: 0.5;
+.disabled\:opacity-60:disabled {
+  opacity: 0.6;
 }
 
 .disabled\:shadow-none:disabled {

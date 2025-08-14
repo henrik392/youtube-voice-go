@@ -71,6 +71,22 @@
     transform: translateY(0);
 }
 
+/* Subtle button pulse effect */
+.button-pulse-subtle {
+    animation: subtle-pulse 2.5s ease-in-out infinite;
+}
+
+@keyframes subtle-pulse {
+    0%, 100% { 
+        opacity: 0.1;
+        transform: scale(1);
+    }
+    50% { 
+        opacity: 0.2;
+        transform: scale(1.01);
+    }
+}
+
 /* Custom scrollbar for audio elements */
 audio::-webkit-media-controls-panel {
     background-color: rgb(249 250 251);
