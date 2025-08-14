@@ -126,17 +126,9 @@ templ MainPage() {
 					case 'url':
 						const urlElement = document.getElementById('url');
 						if (urlElement) {
-							const url = urlElement.value.trim();
-							// Trust server-rendered validity from /validate-url via data-valid
+							// Trust server-rendered validity from HTMX /validate-url
 							const serverValidAttr = urlElement.getAttribute('data-valid');
-							if (serverValidAttr === null) {
-								// Fallback while waiting for server-rendered attribute
-								isValid = url.length > 0 && (url.includes('youtube.com') || url.includes('youtu.be') || url.includes('tiktok.com') || url.includes('instagram.com'));
-							} else {
-								isValid = serverValidAttr === 'true';
-							}
-							// Update styling immediately for better UX while server response comes back
-							updateURLStyling(urlElement, url, isValid);
+							isValid = serverValidAttr === 'true';
 						}
 						break;
 					case 'file':
@@ -156,19 +148,7 @@ templ MainPage() {
 				return isValid;
 			}
 
-			// Update URL input styling based on validation
-			function updateURLStyling(urlElement, url, isValid) {
-				if (!url || url.length === 0) {
-					// No input - neutral state
-					urlElement.className = "block w-full rounded-md py-1.5 pl-9 pr-4 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6";
-				} else if (isValid) {
-					// Valid URL - green border
-					urlElement.className = "block w-full rounded-md py-1.5 pl-9 pr-4 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 border-2 border-green-500";
-				} else {
-					// Invalid URL - red border
-					urlElement.className = "block w-full rounded-md py-1.5 pl-9 pr-4 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 border-2 border-red-500";
-				}
-			}
+			// URL styling is handled by HTMX server responses
 
 			// Set up real-time validation
 			function setupValidation() {
@@ -179,23 +159,9 @@ templ MainPage() {
 					textElement.addEventListener('blur', validateText);
 				}
 
-				// URL validation (when in URL mode)
-				const urlElement = document.getElementById('url');
-				if (urlElement && validationState.audioMode === 'url') {
-					// Remove existing listeners to prevent duplicates
-					urlElement.removeEventListener('input', validateAudioInput);
-					urlElement.removeEventListener('blur', validateAudioInput);
-					urlElement.removeEventListener('keyup', validateAudioInput);
-
-					// Add new listeners for immediate feedback
-					urlElement.addEventListener('input', validateAudioInput);
-					urlElement.addEventListener('blur', validateAudioInput);
-					urlElement.addEventListener('keyup', validateAudioInput);
-				}
-
 				// Initial validation
 				validateText();
-				validateAudioInput();
+				validateAudioInput(); // Check current validation state
 			}
 
 			// Enhanced form submission handling
@@ -240,17 +206,19 @@ templ MainPage() {
 				}
 			});
 
-			// Re-initialize validation after HTMX swaps (e.g., URL input re-render)
+			// Re-initialize validation after HTMX swaps
 			document.addEventListener('htmx:afterSwap', function(evt) {
-				// After swapping URL input, reattach listeners and revalidate
+				// Only re-setup text validation, URL validation is handled by HTMX
 				setTimeout(() => {
 					setupValidation();
-					validateAudioInput();
+					// Update button state based on current server validation
+					validateAudioInput(); // Check current validation state
+					updateButtonState();
 				}, 0);
 			});
 
 			// Form validation before submission
-			document.getElementById('voice-form').addEventListener('htmx:beforeRequest', function(evt) {
+			document.getElementById('generate-button').addEventListener('htmx:beforeRequest', function(evt) {
 				const text = document.getElementById('text').value.trim();
 				const audioMode = document.querySelector('input[name="audio-mode"]:checked')?.value;
 
@@ -373,6 +341,7 @@ templ MainPage() {
 							setTimeout(() => {
 								setupValidation();
 								validateAudioInput();
+								updateButtonState();
 							}, 200);
 						}
 					}

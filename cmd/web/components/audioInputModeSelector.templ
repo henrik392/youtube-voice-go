@@ -139,11 +139,11 @@ templ AudioInputModeSelector() {
 										type="text"
 										name="url"
 										id="url"
-								class="block w-full rounded-md py-1.5 pl-9 pr-4 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-								data-valid="false"
-								aria-invalid="true"
+										class="block w-full rounded-md py-1.5 pl-9 pr-4 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 border-2 border-red-500"
+										data-valid="false"
+										aria-invalid="true"
 										placeholder="https://www.youtube.com/watch?v=..."
-										hx-trigger="keyup changed delay:100ms"
+										hx-trigger="keyup changed delay:500ms"
 										hx-post="/validate-url"
 										hx-target="#url-input"
 										hx-swap="outerHTML"
@@ -152,6 +152,13 @@ templ AudioInputModeSelector() {
 								</div>
 							</div>
 						`;
+						// Process the newly inserted content with HTMX
+						htmx.process(container);
+						// Also process the specific input element to ensure HTMX binds to it
+						const urlInput = document.getElementById('url');
+						if (urlInput) {
+							htmx.process(urlInput);
+						}
 						break;
 					case 'file':
 						container.innerHTML = `<div id="file-upload-component"></div>`;
