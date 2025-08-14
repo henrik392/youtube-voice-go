@@ -44,11 +44,12 @@ templ MainPage() {
 						</div>
 					</div>
 				</div>
-				<div class="flex flex-col items-center space-y-4 mt-8">
+				<div class="flex flex-col items-center justify-center space-y-4 mt-8 w-full">
 					<button
 						type="submit"
-						class="relative flex items-center justify-center px-8 py-3 text-base font-semibold text-white bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl shadow-lg hover:from-indigo-500 hover:to-purple-500 transform hover:scale-105 transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-75 disabled:cursor-not-allowed disabled:transform-none disabled:hover:from-indigo-600 disabled:hover:to-purple-600"
+						class="relative flex items-center justify-center px-8 py-3 text-base font-semibold text-white bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl shadow-lg hover:from-indigo-500 hover:to-purple-500 transform hover:scale-105 transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:hover:from-indigo-600 disabled:hover:to-purple-600 disabled:shadow-none"
 						id="generate-button"
+						disabled
 					>
 						<!-- Default Icon -->
 						<svg class="w-5 h-5 mr-2 transition-opacity duration-200" id="voice-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -76,6 +77,94 @@ templ MainPage() {
 		</div>
 
 		<script>
+			// Form validation state
+			let validationState = {
+				text: false,
+				audioInput: false,
+				audioMode: 'url' // default mode
+			};
+
+			// Update button state based on validation
+			function updateButtonState() {
+				const button = document.getElementById('generate-button');
+				const isValid = validationState.text && validationState.audioInput;
+				
+				button.disabled = !isValid;
+				
+				if (isValid) {
+					button.classList.remove('opacity-50');
+					button.classList.add('hover:scale-105');
+				} else {
+					button.classList.add('opacity-50');
+					button.classList.remove('hover:scale-105');
+				}
+			}
+
+			// Text validation
+			function validateText() {
+				const textElement = document.getElementById('text');
+				if (!textElement) return false;
+				
+				const text = textElement.value.trim();
+				validationState.text = text.length > 0 && text.length <= 500;
+				updateButtonState();
+				return validationState.text;
+			}
+
+			// Audio input validation
+			function validateAudioInput() {
+				const mode = validationState.audioMode;
+				let isValid = false;
+
+				switch(mode) {
+					case 'url':
+						const urlElement = document.getElementById('url');
+						if (urlElement) {
+							const url = urlElement.value.trim();
+							// Basic URL validation - check if it contains youtube, tiktok, or instagram
+							isValid = url.length > 0 && 
+								(url.includes('youtube.com') || url.includes('youtu.be') || 
+								 url.includes('tiktok.com') || url.includes('instagram.com'));
+						}
+						break;
+					case 'file':
+						// Check if file is selected
+						const selectedFile = window.getSelectedAudioFile && window.getSelectedAudioFile();
+						isValid = !!selectedFile;
+						break;
+					case 'microphone':
+						// Check if audio is recorded
+						const recordedAudio = window.getRecordedAudio && window.getRecordedAudio();
+						isValid = !!recordedAudio;
+						break;
+				}
+
+				validationState.audioInput = isValid;
+				updateButtonState();
+				return isValid;
+			}
+
+			// Set up real-time validation
+			function setupValidation() {
+				// Text validation
+				const textElement = document.getElementById('text');
+				if (textElement) {
+					textElement.addEventListener('input', validateText);
+					textElement.addEventListener('blur', validateText);
+				}
+
+				// URL validation (when in URL mode)
+				const urlElement = document.getElementById('url');
+				if (urlElement) {
+					urlElement.addEventListener('input', validateAudioInput);
+					urlElement.addEventListener('blur', validateAudioInput);
+				}
+
+				// Initial validation
+				validateText();
+				validateAudioInput();
+			}
+
 			// Enhanced form submission handling
 			document.addEventListener('htmx:configRequest', function(evt) {
 				const form = evt.detail.elt;
@@ -201,20 +290,55 @@ templ MainPage() {
 			});
 			
 			function resetButtonState() {
-				const button = document.getElementById('generate-button');
 				const voiceIcon = document.getElementById('voice-icon');
 				const loadingIcon = document.getElementById('loading-icon');
 				const buttonPulse = document.getElementById('button-pulse');
+				const button = document.getElementById('generate-button');
 				const generateText = button.querySelector('.generate-text');
 				
-				button.disabled = false;
 				generateText.textContent = 'Generate Voice Clone';
 				
 				// Switch icons back
 				voiceIcon.classList.remove('hidden');
 				loadingIcon.classList.add('hidden');
 				buttonPulse.classList.add('opacity-0');
+				
+				// Re-validate to set correct disabled state
+				updateButtonState();
 			}
+
+			// Initialize validation on page load
+			document.addEventListener('DOMContentLoaded', function() {
+				// Set initial mode
+				validationState.audioMode = 'url';
+				
+				// Setup validation
+				setTimeout(setupValidation, 100); // Small delay to ensure elements are loaded
+				
+				// Listen for mode changes
+				document.addEventListener('click', function(e) {
+					if (e.target.closest('.audio-mode-card')) {
+						const card = e.target.closest('.audio-mode-card');
+						const newMode = card.dataset.mode;
+						if (newMode) {
+							validationState.audioMode = newMode;
+							validationState.audioInput = false; // Reset audio input validation
+							// Re-setup validation for new mode
+							setTimeout(() => {
+								setupValidation();
+								validateAudioInput();
+							}, 200);
+						}
+					}
+				});
+			});
+
+			// Expose validation function for external use
+			window.validateForm = function() {
+				validateText();
+				validateAudioInput();
+				return validationState.text && validationState.audioInput;
+			};
 		</script>
 	}
 }
