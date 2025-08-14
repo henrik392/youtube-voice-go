@@ -13,17 +13,17 @@ templ MainPage() {
 					Transform any audio into custom AI-generated speech. Choose your audio source and let our AI clone the voice.
 				</p>
 			</div>
-			
+
 			<div class="max-w-3xl mx-auto">
 				<form id="voice-form" hx-post="/generate-voice-enhanced" hx-target="#audio-player" hx-swap="outerHTML" hx-indicator="#voice-generation-loading">
 					<!-- Audio Input Mode Selector -->
 					@components.AudioInputModeSelector()
-					
+
 					<!-- Dynamic Audio Input Container -->
 					<div id="audio-input-container" class="mb-8">
 						<!-- This will be populated by JavaScript based on selected mode -->
 					</div>
-					
+
 					<!-- Text to Speech Section -->
 					<div class="text-start">
 						@components.TextAreaToSpeech()
@@ -48,7 +48,7 @@ templ MainPage() {
 					<div class="flex flex-col items-center justify-center space-y-4 mt-8 w-full">
 						<button
 							type="submit"
-							class="relative flex items-center justify-center px-8 py-3 text-base font-semibold text-white bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl shadow-lg hover:from-indigo-500 hover:to-purple-500 transform hover:scale-105 transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none disabled:hover:from-indigo-600 disabled:hover:to-purple-600 disabled:shadow-none"
+							class="relative flex items-center justify-center w-full px-8 py-3 text-base font-semibold text-white bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl shadow-lg hover:from-indigo-500 hover:to-purple-500 transform hover:scale-105 transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none disabled:hover:from-indigo-600 disabled:hover:to-purple-600 disabled:shadow-none"
 							id="generate-button"
 							disabled
 						>
@@ -56,24 +56,24 @@ templ MainPage() {
 						<svg class="w-5 h-5 mr-2 transition-opacity duration-200" id="voice-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 14.142M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/>
 						</svg>
-						
+
 						<!-- Loading Icon -->
 						<svg class="w-5 h-5 mr-2 hidden animate-spin transition-opacity duration-200" id="loading-icon" fill="none" viewBox="0 0 24 24">
 							<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
 							<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
 						</svg>
-						
+
 						<span class="generate-text transition-opacity duration-200">Generate Voice Clone</span>
-						
+
 						<!-- Subtle Pulse Effect when Loading -->
 						<div class="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-xl opacity-0" id="button-pulse"></div>
 					</button>
-					
+
 					@components.AudioPlayer("", "")
 					</div>
 				</form>
 			</div>
-			
+
 			<!-- Loading Animation -->
 			@components.LoadingAnimation()
 		</div>
@@ -90,9 +90,9 @@ templ MainPage() {
 			function updateButtonState() {
 				const button = document.getElementById('generate-button');
 				const isValid = validationState.text && validationState.audioInput;
-				
+
 				button.disabled = !isValid;
-				
+
 				if (isValid) {
 					button.classList.remove('opacity-60');
 					button.classList.add('hover:scale-105');
@@ -110,7 +110,7 @@ templ MainPage() {
 			function validateText() {
 				const textElement = document.getElementById('text');
 				if (!textElement) return false;
-				
+
 				const text = textElement.value.trim();
 				validationState.text = text.length > 0 && text.length <= 500;
 				updateButtonState();
@@ -127,10 +127,16 @@ templ MainPage() {
 						const urlElement = document.getElementById('url');
 						if (urlElement) {
 							const url = urlElement.value.trim();
-							// Basic URL validation - check if it contains youtube, tiktok, or instagram
-							isValid = url.length > 0 && 
-								(url.includes('youtube.com') || url.includes('youtu.be') || 
-								 url.includes('tiktok.com') || url.includes('instagram.com'));
+							// Trust server-rendered validity from /validate-url via data-valid
+							const serverValidAttr = urlElement.getAttribute('data-valid');
+							if (serverValidAttr === null) {
+								// Fallback while waiting for server-rendered attribute
+								isValid = url.length > 0 && (url.includes('youtube.com') || url.includes('youtu.be') || url.includes('tiktok.com') || url.includes('instagram.com'));
+							} else {
+								isValid = serverValidAttr === 'true';
+							}
+							// Update styling immediately for better UX while server response comes back
+							updateURLStyling(urlElement, url, isValid);
 						}
 						break;
 					case 'file':
@@ -150,6 +156,20 @@ templ MainPage() {
 				return isValid;
 			}
 
+			// Update URL input styling based on validation
+			function updateURLStyling(urlElement, url, isValid) {
+				if (!url || url.length === 0) {
+					// No input - neutral state
+					urlElement.className = "block w-full rounded-md py-1.5 pl-9 pr-4 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6";
+				} else if (isValid) {
+					// Valid URL - green border
+					urlElement.className = "block w-full rounded-md py-1.5 pl-9 pr-4 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 border-2 border-green-500";
+				} else {
+					// Invalid URL - red border
+					urlElement.className = "block w-full rounded-md py-1.5 pl-9 pr-4 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 border-2 border-red-500";
+				}
+			}
+
 			// Set up real-time validation
 			function setupValidation() {
 				// Text validation
@@ -161,9 +181,16 @@ templ MainPage() {
 
 				// URL validation (when in URL mode)
 				const urlElement = document.getElementById('url');
-				if (urlElement) {
+				if (urlElement && validationState.audioMode === 'url') {
+					// Remove existing listeners to prevent duplicates
+					urlElement.removeEventListener('input', validateAudioInput);
+					urlElement.removeEventListener('blur', validateAudioInput);
+					urlElement.removeEventListener('keyup', validateAudioInput);
+
+					// Add new listeners for immediate feedback
 					urlElement.addEventListener('input', validateAudioInput);
 					urlElement.addEventListener('blur', validateAudioInput);
+					urlElement.addEventListener('keyup', validateAudioInput);
 				}
 
 				// Initial validation
@@ -186,7 +213,7 @@ templ MainPage() {
 							formData.append('audio-file', selectedFile);
 							formData.append('text', evt.detail.parameters.text);
 							formData.append('audio-mode', audioMode);
-							
+
 							// Override the request to send FormData
 							evt.detail.xhr = new XMLHttpRequest();
 							evt.detail.xhr.open('POST', evt.detail.path);
@@ -201,7 +228,7 @@ templ MainPage() {
 							formData.append('recording', recordedAudio);
 							formData.append('text', evt.detail.parameters.text);
 							formData.append('audio-mode', audioMode);
-							
+
 							// Override the request to send FormData
 							evt.detail.xhr = new XMLHttpRequest();
 							evt.detail.xhr.open('POST', evt.detail.path);
@@ -213,11 +240,20 @@ templ MainPage() {
 				}
 			});
 
+			// Re-initialize validation after HTMX swaps (e.g., URL input re-render)
+			document.addEventListener('htmx:afterSwap', function(evt) {
+				// After swapping URL input, reattach listeners and revalidate
+				setTimeout(() => {
+					setupValidation();
+					validateAudioInput();
+				}, 0);
+			});
+
 			// Form validation before submission
 			document.getElementById('voice-form').addEventListener('htmx:beforeRequest', function(evt) {
 				const text = document.getElementById('text').value.trim();
 				const audioMode = document.querySelector('input[name="audio-mode"]:checked')?.value;
-				
+
 				if (!text) {
 					alert('Please enter text to convert to speech.');
 					evt.preventDefault();
@@ -232,8 +268,10 @@ templ MainPage() {
 
 				// Mode-specific validation
 				if (audioMode === 'url') {
-					const url = document.getElementById('url')?.value.trim();
-					if (!url) {
+					const urlEl = document.getElementById('url');
+					const url = urlEl?.value.trim();
+					const serverValid = urlEl?.getAttribute('data-valid') === 'true';
+					if (!url || !serverValid) {
 						alert('Please enter a valid video URL.');
 						evt.preventDefault();
 						return;
@@ -260,16 +298,16 @@ templ MainPage() {
 				const loadingIcon = document.getElementById('loading-icon');
 				const buttonPulse = document.getElementById('button-pulse');
 				const generateText = button.querySelector('.generate-text');
-				
+
 				button.disabled = true;
 				generateText.textContent = 'Generating Voice...';
-				
+
 				// Switch icons
 				voiceIcon.classList.add('hidden');
 				loadingIcon.classList.remove('hidden');
 				buttonPulse.classList.remove('opacity-0');
 				buttonPulse.classList.add('button-pulse-subtle');
-				
+
 				// Show the loading animation
 				if (window.showVoiceGenerationLoading) {
 					window.showVoiceGenerationLoading();
@@ -279,38 +317,38 @@ templ MainPage() {
 			// Reset button state after request
 			document.getElementById('voice-form').addEventListener('htmx:afterRequest', function(evt) {
 				resetButtonState();
-				
+
 				// Hide the loading animation
 				if (window.hideVoiceGenerationLoading) {
 					window.hideVoiceGenerationLoading();
 				}
 			});
-			
+
 			// Also handle errors by hiding loading
 			document.getElementById('voice-form').addEventListener('htmx:responseError', function(evt) {
 				resetButtonState();
-				
+
 				// Hide the loading animation
 				if (window.hideVoiceGenerationLoading) {
 					window.hideVoiceGenerationLoading();
 				}
 			});
-			
+
 			function resetButtonState() {
 				const voiceIcon = document.getElementById('voice-icon');
 				const loadingIcon = document.getElementById('loading-icon');
 				const buttonPulse = document.getElementById('button-pulse');
 				const button = document.getElementById('generate-button');
 				const generateText = button.querySelector('.generate-text');
-				
+
 				generateText.textContent = 'Generate Voice Clone';
-				
+
 				// Switch icons back
 				voiceIcon.classList.remove('hidden');
 				loadingIcon.classList.add('hidden');
 				buttonPulse.classList.add('opacity-0');
 				buttonPulse.classList.remove('button-pulse-subtle');
-				
+
 				// Re-validate to set correct disabled state
 				updateButtonState();
 			}
@@ -319,10 +357,10 @@ templ MainPage() {
 			document.addEventListener('DOMContentLoaded', function() {
 				// Set initial mode
 				validationState.audioMode = 'url';
-				
+
 				// Setup validation
 				setTimeout(setupValidation, 100); // Small delay to ensure elements are loaded
-				
+
 				// Listen for mode changes
 				document.addEventListener('click', function(e) {
 					if (e.target.closest('.audio-mode-card')) {
