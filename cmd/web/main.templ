@@ -65,7 +65,6 @@ templ MainPage() {
 					audioMode: 'url',
 					textValid: false,
 					audioInputValid: false,
-					isLoading: false,
 					
 					// Computed
 					get isFormValid() {
@@ -84,14 +83,6 @@ templ MainPage() {
 					
 					validateAudioInput(isValid) {
 						this.audioInputValid = isValid;
-					},
-					
-					startLoading() {
-						this.isLoading = true;
-					},
-					
-					stopLoading() {
-						this.isLoading = false;
 					}
 				});
 			});

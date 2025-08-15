@@ -29,28 +29,10 @@ templ SubmitButton() {
 						document.addEventListener('DOMContentLoaded', function() {
 							const button = document.getElementById('generate-button');
 							if (button && typeof Alpine !== 'undefined') {
-								// Set up Alpine attributes
+								// Set up Alpine attributes for form validation only
 								button.setAttribute('x-data', '{}');
 								button.setAttribute('x-bind:disabled', '!$store.voiceClone.isFormValid');
 								button.setAttribute('x-bind:class', '$store.voiceClone.isFormValid ? "hover:scale-105 transform" : "opacity-60 cursor-not-allowed transform-none"');
-								button.setAttribute('x-on:htmx:before-request', '$store.voiceClone.startLoading()');
-								button.setAttribute('x-on:htmx:after-request', '$store.voiceClone.stopLoading()');
-								button.setAttribute('x-on:htmx:response-error', '$store.voiceClone.stopLoading()');
-
-								// Set up icon visibility
-								const voiceIcon = document.getElementById('voice-icon');
-								const loadingIcon = document.getElementById('loading-icon');
-								const buttonPulse = document.getElementById('button-pulse');
-								
-								if (voiceIcon) {
-									voiceIcon.setAttribute('x-show', '!$store.voiceClone.isLoading');
-								}
-								if (loadingIcon) {
-									loadingIcon.setAttribute('x-show', '$store.voiceClone.isLoading');
-								}
-								if (buttonPulse) {
-									buttonPulse.setAttribute('x-bind:class', '$store.voiceClone.isLoading ? "opacity-20 animate-pulse" : "opacity-0"');
-								}
 								
 								// Initialize Alpine on this element
 								Alpine.initTree(button);

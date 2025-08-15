@@ -1,7 +1,7 @@
 package components
 
 templ LoadingAnimation() {
-	<div id="voice-generation-loading" style="display: none;">
+	<div id="voice-generation-loading" class="htmx-indicator">
 		<div class="flex fixed inset-0 z-50 justify-center items-center bg-black bg-opacity-60 backdrop-blur-sm">
 			<div class="p-8 mx-4 max-w-sm bg-white rounded-2xl shadow-2xl" id="loading-modal">
 				<div class="text-center">
@@ -56,6 +56,17 @@ templ LoadingAnimation() {
 	</div>
 
 	<style>
+		/* HTMX indicator styles */
+		.htmx-indicator {
+			display: none !important;
+		}
+		.htmx-request .htmx-indicator {
+			display: block !important;
+		}
+		.htmx-request.htmx-indicator {
+			display: block !important;
+		}
+
 		@keyframes wave-1 {
 			0%, 100% { height: 12px; }
 			50% { height: 32px; }
@@ -99,24 +110,4 @@ templ LoadingAnimation() {
 		.animate-wave-8 { animation: wave-8 1.2s ease-in-out infinite 0.7s; }
 	</style>
 
-	<script>
-		// Initialize Alpine.js on the loading animation
-		document.addEventListener('DOMContentLoaded', function() {
-			const loading = document.getElementById('voice-generation-loading');
-			if (loading && typeof Alpine !== 'undefined') {
-				// Set up Alpine attributes
-				loading.setAttribute('x-data', '{}');
-				loading.setAttribute('x-show', '$store.voiceClone.isLoading');
-				loading.setAttribute('x-transition:enter', 'transition ease-out duration-300');
-				loading.setAttribute('x-transition:enter-start', 'opacity-0 scale-95');
-				loading.setAttribute('x-transition:enter-end', 'opacity-100 scale-100');
-				loading.setAttribute('x-transition:leave', 'transition ease-in duration-300');
-				loading.setAttribute('x-transition:leave-start', 'opacity-100 scale-100');
-				loading.setAttribute('x-transition:leave-end', 'opacity-0 scale-95');
-				
-				// Initialize Alpine on this element
-				Alpine.initTree(loading);
-			}
-		});
-	</script>
 }
