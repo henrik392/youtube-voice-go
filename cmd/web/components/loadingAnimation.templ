@@ -2,8 +2,8 @@ package components
 
 templ LoadingAnimation() {
 	<div id="voice-generation-loading" class="hidden">
-		<div class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
-			<div class="bg-white rounded-2xl p-8 max-w-sm mx-4 shadow-2xl">
+		<div class="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center backdrop-blur-sm">
+			<div class="bg-white rounded-2xl p-8 max-w-sm mx-4 shadow-2xl transform transition-all duration-300 scale-95 opacity-0" id="loading-modal">
 				<div class="text-center">
 					<!-- Voice Wave Animation -->
 					<div class="mb-6">
@@ -105,11 +105,19 @@ templ LoadingAnimation() {
 
 		window.showVoiceGenerationLoading = function() {
 			const loading = document.getElementById('voice-generation-loading');
+			const modal = document.getElementById('loading-modal');
+			
 			loading.classList.remove('hidden');
 			
 			// Reset progress
 			currentStep = 1;
 			updateProgress();
+			
+			// Animate in
+			setTimeout(() => {
+				modal.classList.remove('scale-95', 'opacity-0');
+				modal.classList.add('scale-100', 'opacity-100');
+			}, 50);
 			
 			// Start progress simulation
 			progressInterval = setInterval(() => {
@@ -122,7 +130,16 @@ templ LoadingAnimation() {
 
 		window.hideVoiceGenerationLoading = function() {
 			const loading = document.getElementById('voice-generation-loading');
-			loading.classList.add('hidden');
+			const modal = document.getElementById('loading-modal');
+			
+			// Animate out
+			modal.classList.remove('scale-100', 'opacity-100');
+			modal.classList.add('scale-95', 'opacity-0');
+			
+			// Hide after animation
+			setTimeout(() => {
+				loading.classList.add('hidden');
+			}, 300);
 			
 			if (progressInterval) {
 				clearInterval(progressInterval);

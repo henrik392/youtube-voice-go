@@ -12,6 +12,16 @@ import (
 	"github.com/google/uuid"
 )
 
+// URLInputHandler serves the URL input component
+func URLInputHandler(w http.ResponseWriter, r *http.Request) {
+	component := components.URLInput(false, "")
+	err := component.Render(r.Context(), w)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		log.Printf("Error rendering URLInput component: %v", err)
+	}
+}
+
 // FileUploadHandler serves the file upload component
 func FileUploadHandler(w http.ResponseWriter, r *http.Request) {
 	component := components.FileUpload()

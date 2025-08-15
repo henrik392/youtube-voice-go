@@ -218,7 +218,7 @@ templ MainPage() {
 			});
 
 			// Form validation before submission
-			document.getElementById('generate-button').addEventListener('htmx:beforeRequest', function(evt) {
+			document.getElementById('voice-form').addEventListener('htmx:beforeRequest', function(evt) {
 				const text = document.getElementById('text').value.trim();
 				const audioMode = document.querySelector('input[name="audio-mode"]:checked')?.value;
 
@@ -260,7 +260,7 @@ templ MainPage() {
 					}
 				}
 
-				// Show loading animation and update button state
+				// Update button state only - HTMX indicator will handle loading animation
 				const button = document.getElementById('generate-button');
 				const voiceIcon = document.getElementById('voice-icon');
 				const loadingIcon = document.getElementById('loading-icon');
@@ -275,31 +275,16 @@ templ MainPage() {
 				loadingIcon.classList.remove('hidden');
 				buttonPulse.classList.remove('opacity-0');
 				buttonPulse.classList.add('button-pulse-subtle');
-
-				// Show the loading animation
-				if (window.showVoiceGenerationLoading) {
-					window.showVoiceGenerationLoading();
-				}
 			});
 
 			// Reset button state after request
 			document.getElementById('voice-form').addEventListener('htmx:afterRequest', function(evt) {
 				resetButtonState();
-
-				// Hide the loading animation
-				if (window.hideVoiceGenerationLoading) {
-					window.hideVoiceGenerationLoading();
-				}
 			});
 
 			// Also handle errors by hiding loading
 			document.getElementById('voice-form').addEventListener('htmx:responseError', function(evt) {
 				resetButtonState();
-
-				// Hide the loading animation
-				if (window.hideVoiceGenerationLoading) {
-					window.hideVoiceGenerationLoading();
-				}
 			});
 
 			function resetButtonState() {

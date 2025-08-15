@@ -27,6 +27,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 	r.Get("/serve-audio", web.ServeAudioHandler)
 	
 	// Component handlers for dynamic loading
+	r.Get("/components/url-input", web.URLInputHandler)
 	r.Get("/components/file-upload", web.FileUploadHandler)
 	r.Get("/components/microphone", web.MicrophoneHandler)
 	
