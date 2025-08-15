@@ -14,7 +14,7 @@ templ MainPage() {
 				</p>
 			</div>
 
-			<div class="mx-auto max-w-3xl" hx-post="/validate-url" hx-trigger="load" hx-target="#audio-input-container" hx-swap="outerHTML">
+			<div class="mx-auto max-w-3xl">
 				<form id="voice-form" hx-post="/generate-voice-enhanced" hx-target="#audio-player" hx-swap="outerHTML" hx-indicator="#voice-generation-loading">
 					<!-- Audio Input Mode Selector -->
 					@components.AudioInputModeSelector()
@@ -94,6 +94,12 @@ templ MainPage() {
 						this.isLoading = false;
 					}
 				});
+			});
+
+			// Load default URL input on page load
+			document.addEventListener('DOMContentLoaded', function() {
+				// Load URL input by default
+				htmx.ajax('POST', '/validate-url', {target: '#audio-input-container'});
 			});
 
 			// Enhanced form submission handling for file and microphone modes

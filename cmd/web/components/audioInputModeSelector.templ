@@ -117,8 +117,24 @@ templ AudioInputModeSelector() {
 					const cardElement = card.querySelector('.relative');
 					const radio = card.querySelector('input[type="radio"]');
 					
-					// Set up Alpine attributes
-					card.setAttribute('x-on:click', `$store.voiceClone.setAudioMode('${mode}'); htmx.ajax('POST', '/validate-url', {target: '#audio-input-container'})`);
+					// Set up different endpoints for different modes
+					let endpoint;
+					switch(mode) {
+						case 'url':
+							endpoint = '/validate-url';
+							break;
+						case 'file':
+							endpoint = '/components/file-upload';
+							break;
+						case 'microphone':
+							endpoint = '/components/microphone';
+							break;
+						default:
+							endpoint = '/validate-url';
+					}
+					
+					// Set up Alpine attributes with correct endpoints
+					card.setAttribute('x-on:click', `$store.voiceClone.setAudioMode('${mode}'); htmx.ajax('${mode === 'url' ? 'POST' : 'GET'}', '${endpoint}', {target: '#audio-input-container'})`);
 					cardElement.setAttribute('x-bind:class', `$store.voiceClone.audioMode === '${mode}' ? 'border-indigo-500 bg-indigo-50 ring-2 ring-indigo-500' : 'border-gray-200 bg-white hover:border-indigo-300 hover:bg-gray-50'`);
 					radio.setAttribute('x-bind:checked', `$store.voiceClone.audioMode === '${mode}'`);
 				});
