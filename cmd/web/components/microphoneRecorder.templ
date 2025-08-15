@@ -339,8 +339,12 @@ templ MicrophoneRecorder() {
 
 		// Notify validation system when recording state changes
 		function notifyValidationSystem() {
-			if (window.validateForm) {
-				setTimeout(window.validateForm, 50);
+			// Check if we have a valid recording
+			const isValid = recordedBlob !== null && recordedBlob.size > 0;
+			
+			// Update Alpine.js store validation state
+			if (typeof Alpine !== 'undefined' && Alpine.store('voiceClone')) {
+				Alpine.store('voiceClone').validateAudioInput(isValid);
 			}
 		}
 
