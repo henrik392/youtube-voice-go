@@ -215,9 +215,14 @@ templ FileUpload() {
 			// Check if we have a valid file
 			const isValid = selectedFile !== null;
 			
+			console.log('File validation:', isValid, selectedFile);
+			
 			// Update Alpine.js store validation state
 			if (typeof Alpine !== 'undefined' && Alpine.store('voiceClone')) {
 				Alpine.store('voiceClone').validateAudioInput(isValid);
+				console.log('Alpine store updated - audioInputValid:', Alpine.store('voiceClone').audioInputValid);
+			} else {
+				console.log('Alpine not available');
 			}
 		}
 	</script>

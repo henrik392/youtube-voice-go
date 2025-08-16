@@ -34,6 +34,9 @@ templ SubmitButton() {
 								button.setAttribute('x-bind:disabled', '!$store.voiceClone.isFormValid');
 								button.setAttribute('x-bind:class', '$store.voiceClone.isFormValid ? "hover:scale-105 transform" : "opacity-60 cursor-not-allowed transform-none"');
 								
+								// Debug: Watch for store changes
+								button.setAttribute('x-effect', 'console.log("Form valid:", $store.voiceClone.isFormValid, "Text valid:", $store.voiceClone.textValid, "Audio valid:", $store.voiceClone.audioInputValid)');
+								
 								// Initialize Alpine on this element
 								Alpine.initTree(button);
 							}

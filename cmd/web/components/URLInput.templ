@@ -8,7 +8,12 @@ func URLBorderColor(isValid bool) string {
 }
 
 templ URLInput(isValid bool, url string) {
-	<div id="url-input" x-data x-init="$store.voiceClone.validateAudioInput({{ if isValid }}true{{ else }}false{{ end }})">
+	<div id="url-input" x-data>
+		if isValid {
+			<div x-init="Alpine.store('voiceClone').validateAudioInput(true)"></div>
+		} else {
+			<div x-init="Alpine.store('voiceClone').validateAudioInput(false)"></div>
+		}
 		<label for="url" class="block pl-4 text-sm font-bold leading-6 text-gray-900">Video URL</label>
 		<div
 			class="relative mt-2 rounded-md shadow-sm"
