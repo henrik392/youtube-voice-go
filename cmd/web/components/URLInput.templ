@@ -14,6 +14,15 @@ templ URLInput(isValid bool, url string) {
 		} else {
 			<div x-init="Alpine.store('voiceClone').validateAudioInput(false)"></div>
 		}
+		
+		<!-- YouTube Issues Warning -->
+		<div class="mb-4 p-4 bg-gradient-to-r from-amber-50 to-orange-50 rounded-lg border border-amber-200">
+			<div class="text-sm text-amber-800">
+				<p class="font-semibold">⚠️ YouTube Processing Currently Unavailable</p>
+				<p class="mt-1 text-amber-700">We're experiencing issues with YouTube video processing. Please try <strong>Instagram</strong> or <strong>TikTok</strong> links for now.</p>
+			</div>
+		</div>
+		
 		<label for="url" class="block pl-4 text-sm font-bold leading-6 text-gray-900">Video URL</label>
 		<div
 			class="relative mt-2 rounded-md shadow-sm"

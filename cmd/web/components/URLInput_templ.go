@@ -51,7 +51,7 @@ func URLInput(isValid bool, url string) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<label for=\"url\" class=\"block pl-4 text-sm font-bold leading-6 text-gray-900\">Video URL</label><div class=\"relative mt-2 rounded-md shadow-sm\"><div class=\"flex absolute inset-y-0 left-0 items-center pl-3 pointer-events-none\"><img class=\"w-auto h-4 opacity-70\" src=\"https://cdn-icons-png.freepik.com/256/455/455691.png?semt=ais_hybrid\" alt=\"\"></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<!-- YouTube Issues Warning --><div class=\"mb-4 p-4 bg-gradient-to-r from-amber-50 to-orange-50 rounded-lg border border-amber-200\"><div class=\"text-sm text-amber-800\"><p class=\"font-semibold\">⚠️ YouTube Processing Currently Unavailable</p><p class=\"mt-1 text-amber-700\">We're experiencing issues with YouTube video processing. Please try <strong>Instagram</strong> or <strong>TikTok</strong> links for now.</p></div></div><label for=\"url\" class=\"block pl-4 text-sm font-bold leading-6 text-gray-900\">Video URL</label><div class=\"relative mt-2 rounded-md shadow-sm\"><div class=\"flex absolute inset-y-0 left-0 items-center pl-3 pointer-events-none\"><img class=\"w-auto h-4 opacity-70\" src=\"https://cdn-icons-png.freepik.com/256/455/455691.png?semt=ais_hybrid\" alt=\"\"></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -80,7 +80,7 @@ func URLInput(isValid bool, url string) templ.Component {
 		var templ_7745c5c3_Var4 string
 		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(isValid)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/URLInput.templ`, Line: 29, Col: 24}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/URLInput.templ`, Line: 38, Col: 24}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 		if templ_7745c5c3_Err != nil {
@@ -93,7 +93,7 @@ func URLInput(isValid bool, url string) templ.Component {
 		var templ_7745c5c3_Var5 string
 		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(!isValid)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/URLInput.templ`, Line: 30, Col: 27}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/URLInput.templ`, Line: 39, Col: 27}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 		if templ_7745c5c3_Err != nil {
@@ -106,7 +106,7 @@ func URLInput(isValid bool, url string) templ.Component {
 		var templ_7745c5c3_Var6 string
 		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(url)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/URLInput.templ`, Line: 32, Col: 15}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/web/components/URLInput.templ`, Line: 41, Col: 15}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 		if templ_7745c5c3_Err != nil {
