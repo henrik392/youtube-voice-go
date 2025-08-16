@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 )
 
 type Processor struct {
@@ -104,8 +105,12 @@ func (p *Processor) setupCookies() (string, error) {
 		}
 		defer tmpFile.Close()
 
+		// Clean up the cookies string (remove quotes and handle line endings)
+		cleanedCookies := strings.Trim(cookiesEnv, `"`)
+		cleanedCookies = strings.ReplaceAll(cleanedCookies, `\n`, "\n")
+		
 		// Write cookies to temporary file
-		if _, err := tmpFile.WriteString(cookiesEnv); err != nil {
+		if _, err := tmpFile.WriteString(cleanedCookies); err != nil {
 			os.Remove(tmpFile.Name())
 			return "", fmt.Errorf("failed to write cookies to temporary file: %v", err)
 		}
