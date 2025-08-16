@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"path/filepath"
 )
 
 type Processor struct {
@@ -42,12 +43,30 @@ func (p *Processor) DownloadAudio(url, videoID string) (string, error) {
 	}
 	log.Printf("DownloadAudio: Found ffmpeg at: %s", ffmpegPath)
 
-	cmd := exec.Command("yt-dlp",
+	// Setup cookies
+	cookiesPath, err := p.setupCookies()
+	if err != nil {
+		return "", fmt.Errorf("failed to setup cookies: %v", err)
+	}
+	defer func() {
+		if cookiesPath != "" {
+			os.Remove(cookiesPath)
+		}
+	}()
+
+	args := []string{
 		"-x",
 		"--audio-format", "mp3",
 		"-o", outputFile,
 		"--postprocessor-args", "ffmpeg:-t 180", // Limit to max 3 minutes
-		url)
+	}
+
+	if cookiesPath != "" {
+		args = append(args, "--cookies", cookiesPath)
+	}
+
+	args = append(args, url)
+	cmd := exec.Command("yt-dlp", args...)
 
 	log.Printf("DownloadAudio: Executing command: %s", cmd.String())
 
@@ -69,4 +88,42 @@ func (p *Processor) DownloadAudio(url, videoID string) (string, error) {
 
 	log.Printf("DownloadAudio: Successfully downloaded to: %s", outputFile)
 	return outputFile, nil
+}
+
+// setupCookies creates a temporary cookies file from environment variable or uses local file
+func (p *Processor) setupCookies() (string, error) {
+	// Check for cookies in environment variable first
+	cookiesEnv := os.Getenv("YOUTUBE_COOKIES")
+	if cookiesEnv != "" {
+		log.Printf("Using cookies from environment variable")
+		
+		// Create temporary file
+		tmpFile, err := os.CreateTemp("", "cookies_*.txt")
+		if err != nil {
+			return "", fmt.Errorf("failed to create temporary cookies file: %v", err)
+		}
+		defer tmpFile.Close()
+
+		// Write cookies to temporary file
+		if _, err := tmpFile.WriteString(cookiesEnv); err != nil {
+			os.Remove(tmpFile.Name())
+			return "", fmt.Errorf("failed to write cookies to temporary file: %v", err)
+		}
+
+		return tmpFile.Name(), nil
+	}
+
+	// Fallback to local cookies.txt file
+	cookiesFile := "cookies.txt"
+	if _, err := os.Stat(cookiesFile); err == nil {
+		log.Printf("Using local cookies file: %s", cookiesFile)
+		absPath, err := filepath.Abs(cookiesFile)
+		if err != nil {
+			return "", fmt.Errorf("failed to get absolute path for cookies file: %v", err)
+		}
+		return absPath, nil
+	}
+
+	log.Printf("No cookies found - proceeding without authentication")
+	return "", nil
 }
