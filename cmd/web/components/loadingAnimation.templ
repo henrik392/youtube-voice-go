@@ -1,7 +1,7 @@
 package components
 
 templ LoadingAnimation() {
-	<div id="voice-generation-loading" class="voice-loading-indicator">
+	<div id="voice-generation-loading" class="voice-loading-indicator" x-data="loadingProgress()" x-init="init()">
 		<div class="flex fixed inset-0 z-50 justify-center items-center bg-black bg-opacity-60 backdrop-blur-sm">
 			<div class="p-8 mx-4 max-w-sm bg-white rounded-2xl shadow-2xl" id="loading-modal">
 				<div class="text-center">
@@ -25,31 +25,55 @@ templ LoadingAnimation() {
 
 					<!-- Progress Steps -->
 					<div class="mb-6 space-y-2 text-left">
-						<div class="flex items-center space-x-3" id="step-1">
-							<div class="flex flex-shrink-0 justify-center items-center w-4 h-4 bg-green-500 rounded-full">
-								<svg class="w-2.5 h-2.5 text-white" fill="currentColor" viewBox="0 0 20 20">
+						<div class="flex items-center space-x-3">
+							<div class="flex flex-shrink-0 justify-center items-center w-4 h-4 rounded-full transition-all duration-300"
+								 :class="currentStep >= 1 ? 'bg-green-500' : 'border-2 border-gray-300'">
+								<svg x-show="currentStep >= 1" class="w-2.5 h-2.5 text-white" fill="currentColor" viewBox="0 0 20 20">
 									<path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
 								</svg>
+								<div x-show="currentStep === 1" class="w-full h-full bg-indigo-600 rounded-full animate-ping"></div>
 							</div>
-							<span class="text-sm text-gray-700">Processing audio input</span>
+							<span class="text-sm transition-colors duration-300" :class="currentStep >= 1 ? 'text-gray-700' : 'text-gray-400'">
+								Processing audio input
+							</span>
 						</div>
-						<div class="flex items-center space-x-3" id="step-2">
-							<div class="flex-shrink-0 w-4 h-4 rounded-full border-2 border-indigo-600 animate-pulse">
-								<div class="w-full h-full bg-indigo-600 rounded-full animate-ping"></div>
+						<div class="flex items-center space-x-3">
+							<div class="flex flex-shrink-0 justify-center items-center w-4 h-4 rounded-full transition-all duration-300"
+								 :class="currentStep >= 2 ? 'bg-green-500' : 'border-2 border-gray-300'">
+								<svg x-show="currentStep >= 3" class="w-2.5 h-2.5 text-white" fill="currentColor" viewBox="0 0 20 20">
+									<path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+								</svg>
+								<div x-show="currentStep === 2" class="w-full h-full bg-indigo-600 rounded-full animate-ping"></div>
 							</div>
-							<span class="text-sm text-gray-700">Analyzing voice patterns</span>
+							<span class="text-sm transition-colors duration-300" :class="currentStep >= 2 ? 'text-gray-700' : 'text-gray-400'">
+								Analyzing voice patterns
+							</span>
 						</div>
-						<div class="flex items-center space-x-3" id="step-3">
-							<div class="flex-shrink-0 w-4 h-4 rounded-full border-2 border-gray-300"></div>
-							<span class="text-sm text-gray-400">Generating speech</span>
+						<div class="flex items-center space-x-3">
+							<div class="flex flex-shrink-0 justify-center items-center w-4 h-4 rounded-full transition-all duration-300"
+								 :class="currentStep >= 3 ? 'bg-green-500' : 'border-2 border-gray-300'">
+								<svg x-show="currentStep >= 4" class="w-2.5 h-2.5 text-white" fill="currentColor" viewBox="0 0 20 20">
+									<path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+								</svg>
+								<div x-show="currentStep === 3" class="w-full h-full bg-indigo-600 rounded-full animate-ping"></div>
+							</div>
+							<span class="text-sm transition-colors duration-300" :class="currentStep >= 3 ? 'text-gray-700' : 'text-gray-400'">
+								Generating speech
+							</span>
 						</div>
 					</div>
 
 					<!-- Progress Bar -->
 					<div class="w-full h-2 bg-gray-200 rounded-full">
-						<div class="h-2 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-full transition-all duration-1000" id="progress-bar" style="width: 33%"></div>
+						<div class="h-2 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-full transition-all duration-500" 
+							 :style="`width: ${progress}%`"></div>
 					</div>
-					<p class="mt-2 text-xs text-gray-500">This may take 20-30 seconds</p>
+					<div class="flex justify-between items-center mt-2">
+						<p class="text-xs text-gray-500">
+							Estimated time: <span x-text="timeRemaining"></span>
+						</p>
+						<p class="text-xs text-gray-600" x-text="`${Math.round(progress)}%`"></p>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -109,5 +133,123 @@ templ LoadingAnimation() {
 		.animate-wave-7 { animation: wave-7 1.2s ease-in-out infinite 0.6s; }
 		.animate-wave-8 { animation: wave-8 1.2s ease-in-out infinite 0.7s; }
 	</style>
+
+	<script>
+		function loadingProgress() {
+			return {
+				progress: 0,
+				currentStep: 0,
+				timeRemaining: '20-30 seconds',
+				estimatedDuration: 25000, // 25 seconds baseline
+				startTime: null,
+				progressInterval: null,
+
+				init() {
+					// Listen for when this element gets the htmx-request class
+					const observer = new MutationObserver((mutations) => {
+						mutations.forEach((mutation) => {
+							if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+								const target = mutation.target;
+								if (target.classList.contains('htmx-request')) {
+									this.reset();
+									this.startProgress();
+								} else {
+									this.stopProgress();
+								}
+							}
+						});
+					});
+					
+					observer.observe(this.$el, { attributes: true });
+				},
+
+				reset() {
+					// Clear any existing interval
+					if (this.progressInterval) {
+						clearInterval(this.progressInterval);
+						this.progressInterval = null;
+					}
+					
+					// Reset all progress variables
+					this.progress = 0;
+					this.currentStep = 0;
+					this.timeRemaining = '20-30 seconds';
+					this.startTime = null;
+				},
+
+				startProgress() {
+					this.startTime = Date.now();
+					this.progress = 5;
+					this.currentStep = 1;
+					this.timeRemaining = '20-30 seconds';
+					
+					// Start the progress animation
+					this.progressInterval = setInterval(() => {
+						this.updateProgress();
+					}, 200);
+				},
+
+				stopProgress() {
+					if (this.progressInterval) {
+						clearInterval(this.progressInterval);
+						this.progressInterval = null;
+					}
+				},
+
+				updateProgress() {
+					const elapsed = Date.now() - this.startTime;
+					const progressRatio = elapsed / this.estimatedDuration;
+					
+					// Ease-out curve for more realistic progress
+					this.progress = Math.min(95, 5 + (90 * this.easeOut(progressRatio)));
+					
+					// Update steps based on progress
+					if (this.progress >= 25 && this.currentStep < 2) {
+						this.currentStep = 2;
+					} else if (this.progress >= 65 && this.currentStep < 3) {
+						this.currentStep = 3;
+					}
+					
+					// Update time remaining
+					this.updateTimeRemaining(elapsed);
+					
+					// Stop at 95% to wait for actual completion
+					if (this.progress >= 95) {
+						clearInterval(this.progressInterval);
+						this.timeRemaining = 'Almost done...';
+					}
+				},
+
+				updateTimeRemaining(elapsed) {
+					const remainingMs = Math.max(0, this.estimatedDuration - elapsed);
+					const remainingSeconds = Math.ceil(remainingMs / 1000);
+					
+					if (remainingSeconds > 15) {
+						this.timeRemaining = '15-30 seconds';
+					} else if (remainingSeconds > 10) {
+						this.timeRemaining = '10-15 seconds';
+					} else if (remainingSeconds > 5) {
+						this.timeRemaining = '5-10 seconds';
+					} else if (remainingSeconds > 0) {
+						this.timeRemaining = 'A few seconds...';
+					} else {
+						this.timeRemaining = 'Almost done...';
+					}
+				},
+
+				easeOut(t) {
+					// Cubic ease-out for natural progress feel
+					return 1 - Math.pow(1 - t, 3);
+				},
+
+				// Clean up interval when component is destroyed
+				destroy() {
+					if (this.progressInterval) {
+						clearInterval(this.progressInterval);
+					}
+				}
+			}
+		}
+	</script>
 
 }
