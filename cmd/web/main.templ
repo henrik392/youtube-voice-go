@@ -15,7 +15,7 @@ templ MainPage() {
 			</div>
 
 			<div class="mx-auto max-w-3xl">
-				<form id="voice-form" hx-post="/generate-voice-enhanced" hx-target="#audio-player" hx-swap="outerHTML">
+				<form id="voice-form" hx-post="/generate-voice-enhanced" hx-target="#audio-player" hx-swap="outerHTML" hx-indicator="#voice-generation-loading" enctype="multipart/form-data">
 					<!-- Audio Input Mode Selector -->
 					@components.AudioInputModeSelector()
 
@@ -93,102 +93,23 @@ templ MainPage() {
 				htmx.ajax('POST', '/validate-url', {target: '#audio-input-container'});
 			});
 
-			// Enhanced form submission handling for file and microphone modes
+			// Add audio mode to request parameters and debug
 			document.addEventListener('htmx:configRequest', function(evt) {
 				const form = evt.detail.elt;
 				if (form.id === 'voice-form') {
+					console.log('HTMX request starting');
 					const audioMode = Alpine.store('voiceClone').audioMode;
 					evt.detail.parameters['audio-mode'] = audioMode;
-
-					// Add mode-specific data
-					if (audioMode === 'file') {
-						const selectedFile = window.getSelectedAudioFile && window.getSelectedAudioFile();
-						if (selectedFile) {
-							// Show loading dialog manually for file mode
-							const loadingDialog = document.getElementById('voice-generation-loading');
-							if (loadingDialog) {
-								loadingDialog.style.display = 'block';
-							}
-
-							const formData = new FormData();
-							formData.append('audio-file', selectedFile);
-							formData.append('text', evt.detail.parameters.text);
-							formData.append('audio-mode', audioMode);
-
-							// Override the request to send FormData
-							evt.detail.xhr = new XMLHttpRequest();
-							evt.detail.xhr.open('POST', evt.detail.path);
-							evt.detail.xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-							
-							// Handle response
-							evt.detail.xhr.onload = function() {
-								// Hide loading dialog
-								if (loadingDialog) {
-									loadingDialog.style.display = 'none';
-								}
-								
-								// Update the target element with response
-								const targetElement = document.querySelector('#audio-player');
-								if (targetElement && evt.detail.xhr.status === 200) {
-									targetElement.outerHTML = evt.detail.xhr.responseText;
-								}
-							};
-							
-							evt.detail.xhr.onerror = function() {
-								// Hide loading dialog on error
-								if (loadingDialog) {
-									loadingDialog.style.display = 'none';
-								}
-							};
-							
-							evt.detail.xhr.send(formData);
-							evt.preventDefault();
-						}
-					} else if (audioMode === 'microphone') {
-						const recordedAudio = window.getRecordedAudio && window.getRecordedAudio();
-						if (recordedAudio) {
-							// Show loading dialog manually for microphone mode
-							const loadingDialog = document.getElementById('voice-generation-loading');
-							if (loadingDialog) {
-								loadingDialog.style.display = 'block';
-							}
-
-							const formData = new FormData();
-							formData.append('recording', recordedAudio);
-							formData.append('text', evt.detail.parameters.text);
-							formData.append('audio-mode', audioMode);
-
-							// Override the request to send FormData
-							evt.detail.xhr = new XMLHttpRequest();
-							evt.detail.xhr.open('POST', evt.detail.path);
-							evt.detail.xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-							
-							// Handle response
-							evt.detail.xhr.onload = function() {
-								// Hide loading dialog
-								if (loadingDialog) {
-									loadingDialog.style.display = 'none';
-								}
-								
-								// Update the target element with response
-								const targetElement = document.querySelector('#audio-player');
-								if (targetElement && evt.detail.xhr.status === 200) {
-									targetElement.outerHTML = evt.detail.xhr.responseText;
-								}
-							};
-							
-							evt.detail.xhr.onerror = function() {
-								// Hide loading dialog on error
-								if (loadingDialog) {
-									loadingDialog.style.display = 'none';
-								}
-							};
-							
-							evt.detail.xhr.send(formData);
-							evt.preventDefault();
-						}
-					}
 				}
+			});
+
+			// Debug HTMX events
+			document.addEventListener('htmx:beforeRequest', function(evt) {
+				console.log('Before request:', evt.detail);
+			});
+
+			document.addEventListener('htmx:afterRequest', function(evt) {
+				console.log('After request:', evt.detail);
 			});
 		</script>
 	}

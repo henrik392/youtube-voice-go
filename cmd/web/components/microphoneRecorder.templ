@@ -234,6 +234,26 @@ templ MicrophoneRecorder() {
 			
 			const audioUrl = URL.createObjectURL(recordedBlob);
 			audio.src = audioUrl;
+			
+			// Create or update hidden input for form submission
+			let hiddenInput = document.getElementById('microphone-recording-input');
+			if (!hiddenInput) {
+				hiddenInput = document.createElement('input');
+				hiddenInput.type = 'file';
+				hiddenInput.name = 'recording';
+				hiddenInput.id = 'microphone-recording-input';
+				hiddenInput.style.display = 'none';
+				document.getElementById('voice-form').appendChild(hiddenInput);
+			}
+			
+			// Create a File object from the blob
+			const file = new File([recordedBlob], 'recording.webm', { type: 'audio/webm' });
+			
+			// Create a new FileList-like object
+			const dataTransfer = new DataTransfer();
+			dataTransfer.items.add(file);
+			hiddenInput.files = dataTransfer.files;
+			
 			notifyValidationSystem();
 			
 			// Calculate duration and quality
@@ -309,6 +329,12 @@ templ MicrophoneRecorder() {
 			if (audio.src) {
 				URL.revokeObjectURL(audio.src);
 				audio.src = '';
+			}
+			
+			// Remove hidden input
+			const hiddenInput = document.getElementById('microphone-recording-input');
+			if (hiddenInput) {
+				hiddenInput.remove();
 			}
 			
 			recordedBlob = null;

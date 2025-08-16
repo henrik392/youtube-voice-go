@@ -58,13 +58,17 @@ templ LoadingAnimation() {
 	<style>
 		/* HTMX indicator styles */
 		.htmx-indicator {
-			display: none !important;
+			opacity: 0;
+			pointer-events: none;
+			transition: opacity 500ms ease-in;
 		}
 		.htmx-request .htmx-indicator {
-			display: block !important;
+			opacity: 1;
+			pointer-events: auto;
 		}
 		.htmx-request.htmx-indicator {
-			display: block !important;
+			opacity: 1;
+			pointer-events: auto;
 		}
 
 		@keyframes wave-1 {
