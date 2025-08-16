@@ -1,0 +1,147 @@
+package components
+
+templ AudioInputModeSelector() {
+	<div id="audio-input-mode-selector" class="mb-8">
+		<div class="mb-6 text-center">
+			<h2 class="mb-2 text-xl font-semibold text-gray-900">Choose Audio Source</h2>
+			<p class="text-sm text-gray-600">Select how you want to provide the voice to clone</p>
+		</div>
+
+		<div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+			<!-- URL Mode -->
+			<div class="audio-mode-card" data-mode="url">
+				<div class="relative p-6 h-full bg-white rounded-xl border border-gray-200 shadow-sm transition-all duration-200 cursor-pointer hover:shadow-md hover:bg-gray-50 hover:border-indigo-300">
+					<div class="flex flex-col items-center h-full text-center">
+						<div class="flex flex-col flex-1 justify-center items-center">
+							<div class="flex justify-center items-center mb-4 w-12 h-12 text-white bg-gradient-to-br from-red-500 to-pink-500 rounded-lg shadow-sm">
+								<svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+									<path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+								</svg>
+							</div>
+							<h3 class="mb-2 text-lg font-semibold text-gray-900">Video URL</h3>
+							<p class="mb-4 text-sm text-gray-500">YouTube, TikTok, Instagram</p>
+						</div>
+						<div class="flex items-center space-x-2 text-xs text-gray-400">
+							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+							</svg>
+							<span>Best quality</span>
+						</div>
+					</div>
+					<input type="radio" name="audio-mode" value="url" class="sr-only" checked/>
+				</div>
+			</div>
+
+			<!-- File Upload Mode -->
+			<div class="audio-mode-card" data-mode="file">
+				<div class="relative p-6 h-full bg-white rounded-xl border border-gray-200 shadow-sm transition-all duration-200 cursor-pointer hover:shadow-md hover:bg-gray-50 hover:border-indigo-300">
+					<div class="flex flex-col items-center h-full text-center">
+						<div class="flex flex-col flex-1 justify-center items-center">
+							<div class="flex justify-center items-center mb-4 w-12 h-12 text-white bg-gradient-to-br from-blue-500 to-cyan-500 rounded-lg shadow-sm">
+								<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+								</svg>
+							</div>
+							<h3 class="mb-2 text-lg font-semibold text-gray-900">Upload File</h3>
+							<p class="mb-4 text-sm text-gray-500">MP3, WAV, M4A files</p>
+						</div>
+						<div class="flex items-center space-x-2 text-xs text-gray-400">
+							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+							</svg>
+							<span>Private & secure</span>
+						</div>
+					</div>
+					<input type="radio" name="audio-mode" value="file" class="sr-only"/>
+				</div>
+			</div>
+
+			<!-- Microphone Mode -->
+			<div class="audio-mode-card" data-mode="microphone">
+				<div class="relative p-6 h-full bg-white rounded-xl border border-gray-200 shadow-sm transition-all duration-200 cursor-pointer hover:shadow-md hover:bg-gray-50 hover:border-indigo-300">
+					<div class="flex flex-col items-center h-full text-center">
+						<div class="flex flex-col flex-1 justify-center items-center">
+							<div class="flex justify-center items-center mb-4 w-12 h-12 text-white bg-gradient-to-br from-green-500 to-emerald-500 rounded-lg shadow-sm">
+								<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/>
+								</svg>
+							</div>
+							<h3 class="mb-2 text-lg font-semibold text-gray-900">Record Audio</h3>
+							<p class="mb-4 text-sm text-gray-500">Use your microphone</p>
+						</div>
+						<div class="flex items-center space-x-2 text-xs text-gray-400">
+							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+							</svg>
+							<span>Real-time</span>
+						</div>
+					</div>
+					<input type="radio" name="audio-mode" value="microphone" class="sr-only"/>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script>
+		// Alpine.js integration with HTMX-compatible approach
+		document.addEventListener('alpine:init', () => {
+			// Initialize Alpine store if not already done
+			if (!Alpine.store('voiceClone')) {
+				Alpine.store('voiceClone', {
+					audioMode: 'url',
+					textValid: false,
+					audioInputValid: false,
+					isLoading: false,
+					get isFormValid() { return this.textValid && this.audioInputValid; },
+					setAudioMode(mode) { this.audioMode = mode; this.audioInputValid = false; },
+					validateText(text) { this.textValid = text.length > 0 && text.length <= 500; },
+					validateAudioInput(isValid) { this.audioInputValid = isValid; },
+					startLoading() { this.isLoading = true; },
+					stopLoading() { this.isLoading = false; }
+				});
+			}
+		});
+
+		// Initialize the mode selector with Alpine behavior
+		document.addEventListener('DOMContentLoaded', function() {
+			const selector = document.getElementById('audio-input-mode-selector');
+			if (selector && typeof Alpine !== 'undefined') {
+				// Set up Alpine data
+				selector.setAttribute('x-data', '{}');
+				selector.setAttribute('x-init', '$store.voiceClone.setAudioMode("url")');
+				
+				// Set up click handlers and reactive classes
+				const cards = selector.querySelectorAll('.audio-mode-card');
+				cards.forEach(card => {
+					const mode = card.dataset.mode;
+					const cardElement = card.querySelector('.relative');
+					const radio = card.querySelector('input[type="radio"]');
+					
+					// Set up different endpoints for different modes
+					let endpoint;
+					switch(mode) {
+						case 'url':
+							endpoint = '/validate-url';
+							break;
+						case 'file':
+							endpoint = '/components/file-upload';
+							break;
+						case 'microphone':
+							endpoint = '/components/microphone';
+							break;
+						default:
+							endpoint = '/validate-url';
+					}
+					
+					// Set up Alpine attributes with correct endpoints
+					card.setAttribute('x-on:click', `$store.voiceClone.setAudioMode('${mode}'); htmx.ajax('${mode === 'url' ? 'POST' : 'GET'}', '${endpoint}', {target: '#audio-input-container'})`);
+					cardElement.setAttribute('x-bind:class', `$store.voiceClone.audioMode === '${mode}' ? 'border-indigo-500 bg-indigo-50 ring-2 ring-indigo-500' : 'border-gray-200 bg-white hover:border-indigo-300 hover:bg-gray-50'`);
+					radio.setAttribute('x-bind:checked', `$store.voiceClone.audioMode === '${mode}'`);
+				});
+				
+				// Initialize Alpine on this element
+				Alpine.initTree(selector);
+			}
+		});
+	</script>
+}

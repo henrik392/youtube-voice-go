@@ -117,7 +117,9 @@ func (c *Client) VoiceClone(prompt, refAudioFilePath string) ([]byte, error) {
 	log.Printf("Using API key: %s...", c.APIKey[:8]) // Log only first 8 chars for security
 
 	log.Printf("Sending request to Zonos API...")
-	client := &http.Client{}
+	client := &http.Client{
+		Timeout: 60 * time.Second, // 60 second timeout for voice cloning API
+	}
 	resp, err := client.Do(req)
 	if err != nil {
 		log.Printf("Error sending request: %v", err)
@@ -153,7 +155,10 @@ func (c *Client) VoiceClone(prompt, refAudioFilePath string) ([]byte, error) {
 }
 
 func (c *Client) downloadAudio(url string) ([]byte, error) {
-	resp, err := http.Get(url)
+	client := &http.Client{
+		Timeout: 30 * time.Second, // 30 second timeout for audio download
+	}
+	resp, err := client.Get(url)
 	if err != nil {
 		return nil, fmt.Errorf("error downloading audio: %w", err)
 	}
@@ -200,7 +205,9 @@ func (c *Client) VoiceCloneWithURL(prompt, refAudioURL string) ([]byte, error) {
 	log.Printf("Using API key: %s...", c.APIKey[:8])
 
 	log.Printf("Sending request to Zonos API...")
-	client := &http.Client{}
+	client := &http.Client{
+		Timeout: 60 * time.Second, // 60 second timeout for voice cloning API
+	}
 	resp, err := client.Do(req)
 	if err != nil {
 		log.Printf("Error sending request: %v", err)

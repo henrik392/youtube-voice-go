@@ -1,0 +1,389 @@
+package components
+
+templ MicrophoneRecorder() {
+	<div id="microphone-recorder" class="mt-4">
+		<label class="block pl-4 text-sm font-bold leading-6 text-gray-900 mb-2">Record Audio</label>
+		
+		<!-- Recording Interface -->
+		<div class="mt-2 p-6 bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg border border-gray-200">
+			<div class="text-center">
+				<!-- Recording Status -->
+				<div id="recording-status" class="mb-4">
+					<div id="status-idle" class="recording-state">
+						<div class="mx-auto w-20 h-20 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center shadow-lg cursor-pointer hover:shadow-xl transition-all duration-200 hover:scale-105" onclick="startRecording()">
+							<svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/>
+							</svg>
+						</div>
+						<p class="mt-3 text-sm font-medium text-gray-700">Click to start recording</p>
+						<p class="text-xs text-gray-500">Make sure to allow microphone access</p>
+					</div>
+
+					<div id="status-recording" class="recording-state hidden">
+						<div class="mx-auto w-20 h-20 bg-gradient-to-br from-red-400 to-red-600 rounded-full flex items-center justify-center shadow-lg animate-pulse">
+							<svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
+								<rect x="6" y="6" width="12" height="12" rx="2"/>
+							</svg>
+						</div>
+						<p class="mt-3 text-sm font-medium text-red-700">Recording...</p>
+						<div class="flex items-center justify-center space-x-2 mt-2">
+							<span id="recording-timer" class="text-lg font-mono text-red-600">00:00</span>
+						</div>
+						<button type="button" onclick="stopRecording()" class="mt-3 px-4 py-2 text-sm font-medium text-red-700 bg-red-100 border border-red-300 rounded-md hover:bg-red-200 transition-colors duration-200">
+							Stop Recording
+						</button>
+					</div>
+
+					<div id="status-processing" class="recording-state hidden">
+						<div class="mx-auto w-20 h-20 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center shadow-lg">
+							<svg class="w-8 h-8 text-white animate-spin" fill="none" viewBox="0 0 24 24">
+								<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+								<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+							</svg>
+						</div>
+						<p class="mt-3 text-sm font-medium text-blue-700">Processing audio...</p>
+					</div>
+				</div>
+
+				<!-- Audio Visualizer -->
+				<div id="audio-visualizer" class="hidden mb-4">
+					<div class="flex justify-center items-end space-x-1 h-12">
+						<div class="w-1 bg-green-500 rounded-full animate-bounce" style="height: 8px; animation-delay: 0ms;"></div>
+						<div class="w-1 bg-green-500 rounded-full animate-bounce" style="height: 16px; animation-delay: 150ms;"></div>
+						<div class="w-1 bg-green-500 rounded-full animate-bounce" style="height: 24px; animation-delay: 300ms;"></div>
+						<div class="w-1 bg-green-500 rounded-full animate-bounce" style="height: 12px; animation-delay: 450ms;"></div>
+						<div class="w-1 bg-green-500 rounded-full animate-bounce" style="height: 32px; animation-delay: 600ms;"></div>
+						<div class="w-1 bg-green-500 rounded-full animate-bounce" style="height: 20px; animation-delay: 750ms;"></div>
+						<div class="w-1 bg-green-500 rounded-full animate-bounce" style="height: 16px; animation-delay: 900ms;"></div>
+						<div class="w-1 bg-green-500 rounded-full animate-bounce" style="height: 8px; animation-delay: 1050ms;"></div>
+					</div>
+				</div>
+
+				<!-- Recording Tips -->
+				<div class="text-xs text-gray-500 space-y-1">
+					<p>💡 <strong>Tip:</strong> Record at least 10 seconds for best results</p>
+					<p>🔇 <strong>Quiet environment</strong> recommended</p>
+					<p>📱 <strong>Speak clearly</strong> and at normal volume</p>
+				</div>
+			</div>
+		</div>
+
+		<!-- Recorded Audio Preview -->
+		<div id="recorded-preview" class="hidden mt-4 p-4 bg-gray-50 border border-gray-200 rounded-lg">
+			<div class="flex items-center justify-between mb-3">
+				<h4 class="text-sm font-medium text-gray-900">Recorded Audio</h4>
+				<div class="flex space-x-2">
+					<button type="button" onclick="playRecording()" class="text-sm text-indigo-600 hover:text-indigo-500 font-medium">
+						Play
+					</button>
+					<button type="button" onclick="retryRecording()" class="text-sm text-gray-600 hover:text-gray-500 font-medium">
+						Re-record
+					</button>
+				</div>
+			</div>
+			
+			<div class="bg-white p-3 rounded border">
+				<audio id="recorded-audio" controls class="w-full h-8">
+					Your browser does not support the audio element.
+				</audio>
+			</div>
+			
+			<div class="mt-2 text-xs text-gray-500">
+				Duration: <span id="audio-duration">0:00</span> | 
+				Quality: <span id="audio-quality">Good</span>
+			</div>
+		</div>
+
+		<!-- Error Messages -->
+		<div id="microphone-error" class="hidden mt-4 p-3 bg-red-50 border border-red-200 rounded-md">
+			<div class="flex items-center">
+				<svg class="w-5 h-5 text-red-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
+					<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+				</svg>
+				<span class="text-red-800 text-sm font-medium" id="mic-error-message">Error message</span>
+			</div>
+		</div>
+	</div>
+
+	<script>
+		let mediaRecorder = null;
+		let recordedChunks = [];
+		let recordingTimer = null;
+		let startTime = null;
+		let recordedBlob = null;
+
+		async function startRecording() {
+			try {
+				hideError();
+				
+				// Request microphone access
+				const stream = await navigator.mediaDevices.getUserMedia({ 
+					audio: {
+						echoCancellation: true,
+						noiseSuppression: true,
+						autoGainControl: true
+					}
+				});
+
+				// Check if MediaRecorder is supported
+				if (!MediaRecorder.isTypeSupported('audio/webm')) {
+					throw new Error('Audio recording not supported in this browser');
+				}
+
+				recordedChunks = [];
+				mediaRecorder = new MediaRecorder(stream, { 
+					mimeType: 'audio/webm'
+				});
+
+				mediaRecorder.addEventListener('dataavailable', event => {
+					if (event.data.size > 0) {
+						recordedChunks.push(event.data);
+					}
+				});
+
+				mediaRecorder.addEventListener('stop', () => {
+					recordedBlob = new Blob(recordedChunks, { type: 'audio/webm' });
+					showRecordedPreview();
+					stream.getTracks().forEach(track => track.stop());
+				});
+
+				// Start recording
+				mediaRecorder.start(1000); // Collect data every second
+				startTime = Date.now();
+				
+				// Update UI
+				showRecordingState();
+				startTimer();
+				showVisualizer();
+
+			} catch (error) {
+				console.error('Recording error:', error);
+				let errorMessage = 'Could not access microphone. ';
+				
+				if (error.name === 'NotAllowedError') {
+					errorMessage += 'Please allow microphone access and try again.';
+				} else if (error.name === 'NotFoundError') {
+					errorMessage += 'No microphone found. Please connect a microphone and try again.';
+				} else {
+					errorMessage += error.message || 'Unknown error occurred.';
+				}
+				
+				showError(errorMessage);
+			}
+		}
+
+		function stopRecording(event) {
+			if (event) {
+				event.preventDefault();
+				event.stopPropagation();
+			}
+			
+			if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+				mediaRecorder.stop();
+				stopTimer();
+				hideVisualizer();
+				showProcessingState();
+			}
+		}
+
+		function showRecordingState() {
+			document.getElementById('status-idle').classList.add('hidden');
+			document.getElementById('status-recording').classList.remove('hidden');
+			document.getElementById('status-processing').classList.add('hidden');
+		}
+
+		function showProcessingState() {
+			document.getElementById('status-recording').classList.add('hidden');
+			document.getElementById('status-processing').classList.remove('hidden');
+		}
+
+		function showIdleState() {
+			document.getElementById('status-recording').classList.add('hidden');
+			document.getElementById('status-processing').classList.add('hidden');
+			document.getElementById('status-idle').classList.remove('hidden');
+		}
+
+		function startTimer() {
+			const timerDisplay = document.getElementById('recording-timer');
+			recordingTimer = setInterval(() => {
+				const elapsed = Math.floor((Date.now() - startTime) / 1000);
+				const minutes = Math.floor(elapsed / 60);
+				const seconds = elapsed % 60;
+				timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+			}, 1000);
+		}
+
+		function stopTimer() {
+			if (recordingTimer) {
+				clearInterval(recordingTimer);
+				recordingTimer = null;
+			}
+		}
+
+		function showVisualizer() {
+			document.getElementById('audio-visualizer').classList.remove('hidden');
+		}
+
+		function hideVisualizer() {
+			document.getElementById('audio-visualizer').classList.add('hidden');
+		}
+
+		function showRecordedPreview() {
+			const preview = document.getElementById('recorded-preview');
+			const audio = document.getElementById('recorded-audio');
+			
+			const audioUrl = URL.createObjectURL(recordedBlob);
+			audio.src = audioUrl;
+			
+			// Create or update hidden input for form submission
+			let hiddenInput = document.getElementById('microphone-recording-input');
+			if (!hiddenInput) {
+				hiddenInput = document.createElement('input');
+				hiddenInput.type = 'file';
+				hiddenInput.name = 'recording';
+				hiddenInput.id = 'microphone-recording-input';
+				hiddenInput.style.display = 'none';
+				document.getElementById('voice-form').appendChild(hiddenInput);
+			}
+			
+			// Create a File object from the blob
+			const file = new File([recordedBlob], 'recording.webm', { type: 'audio/webm' });
+			
+			// Create a new FileList-like object
+			const dataTransfer = new DataTransfer();
+			dataTransfer.items.add(file);
+			hiddenInput.files = dataTransfer.files;
+			
+			notifyValidationSystem();
+			
+			// Calculate duration and quality
+			audio.addEventListener('loadedmetadata', () => {
+				const duration = isNaN(audio.duration) ? 0 : Math.floor(audio.duration);
+				const minutes = Math.floor(duration / 60);
+				const seconds = duration % 60;
+				
+				if (duration > 0) {
+					document.getElementById('audio-duration').textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+					
+					// Simple quality assessment based on duration
+					let quality = 'Good';
+					if (duration < 5) quality = 'Too short';
+					else if (duration < 10) quality = 'Fair';
+					else if (duration > 60) quality = 'Very long';
+					
+					document.getElementById('audio-quality').textContent = quality;
+				} else {
+					// Fallback for when duration isn't available immediately
+					document.getElementById('audio-duration').textContent = 'Processing...';
+					document.getElementById('audio-quality').textContent = 'Analyzing...';
+					
+					// Try again after a short delay
+					setTimeout(() => {
+						const newDuration = isNaN(audio.duration) ? 0 : Math.floor(audio.duration);
+						if (newDuration > 0) {
+							const newMinutes = Math.floor(newDuration / 60);
+							const newSeconds = newDuration % 60;
+							document.getElementById('audio-duration').textContent = `${newMinutes}:${newSeconds.toString().padStart(2, '0')}`;
+							
+							let quality = 'Good';
+							if (newDuration < 5) quality = 'Too short';
+							else if (newDuration < 10) quality = 'Fair';
+							else if (newDuration > 60) quality = 'Very long';
+							
+							document.getElementById('audio-quality').textContent = quality;
+						} else {
+							// Final fallback
+							document.getElementById('audio-duration').textContent = 'Unknown';
+							document.getElementById('audio-quality').textContent = 'Ready';
+						}
+					}, 500);
+				}
+			});
+
+			preview.classList.remove('hidden');
+			showIdleState();
+		}
+
+		function playRecording(event) {
+			if (event) {
+				event.preventDefault();
+				event.stopPropagation();
+			}
+			
+			const audio = document.getElementById('recorded-audio');
+			if (audio.paused) {
+				audio.play();
+			} else {
+				audio.pause();
+			}
+		}
+
+		function retryRecording(event) {
+			if (event) {
+				event.preventDefault();
+				event.stopPropagation();
+			}
+			
+			// Clean up previous recording
+			const audio = document.getElementById('recorded-audio');
+			if (audio.src) {
+				URL.revokeObjectURL(audio.src);
+				audio.src = '';
+			}
+			
+			// Remove hidden input
+			const hiddenInput = document.getElementById('microphone-recording-input');
+			if (hiddenInput) {
+				hiddenInput.remove();
+			}
+			
+			recordedBlob = null;
+			recordedChunks = [];
+			
+			// Hide preview and show idle state
+			document.getElementById('recorded-preview').classList.add('hidden');
+			showIdleState();
+			notifyValidationSystem();
+		}
+
+		function showError(message) {
+			const errorDiv = document.getElementById('microphone-error');
+			const errorMessage = document.getElementById('mic-error-message');
+			errorMessage.textContent = message;
+			errorDiv.classList.remove('hidden');
+			showIdleState();
+		}
+
+		function hideError() {
+			document.getElementById('microphone-error').classList.add('hidden');
+		}
+
+		// Expose recorded blob for form submission
+		window.getRecordedAudio = function() {
+			return recordedBlob;
+		};
+
+		// Notify validation system when recording state changes
+		function notifyValidationSystem() {
+			// Check if we have a valid recording
+			const isValid = recordedBlob !== null && recordedBlob.size > 0;
+			
+			// Update Alpine.js store validation state
+			if (typeof Alpine !== 'undefined' && Alpine.store('voiceClone')) {
+				Alpine.store('voiceClone').validateAudioInput(isValid);
+			}
+		}
+
+		// Check microphone permission status on load
+		document.addEventListener('DOMContentLoaded', async function() {
+			try {
+				const permissionStatus = await navigator.permissions.query({ name: 'microphone' });
+				if (permissionStatus.state === 'denied') {
+					showError('Microphone access denied. Please enable microphone access in your browser settings.');
+				}
+			} catch (error) {
+				// Permissions API not supported, ignore
+			}
+		});
+	</script>
+}

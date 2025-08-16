@@ -43,11 +43,15 @@ func MainPage() templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"text-center\"><h1 class=\"text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl\">Clone Speech From TikTok, Instagram, or YouTube</h1><form id=\"voice-form\" hx-post=\"/generate-voice\" hx-target=\"#audio-player\" hx-swap=\"outerHTML\" hx-indicator=\"#spinner\"><div class=\"pt-20 text-start\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"px-4 py-8 mx-auto max-w-4xl\"><div class=\"mb-12 text-center\"><h1 class=\"mb-4 text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl\">Clone Any Voice with AI</h1><p class=\"mx-auto max-w-2xl text-xl text-gray-600\">Transform any audio into custom AI-generated speech. Choose your audio source and let our AI clone the voice.</p></div><div class=\"mx-auto max-w-3xl\"><form id=\"voice-form\" hx-post=\"/generate-voice-enhanced\" hx-target=\"#audio-player\" hx-swap=\"outerHTML\" hx-indicator=\"#voice-generation-loading\" enctype=\"multipart/form-data\"><!-- Audio Input Mode Selector -->")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = components.URLInput(false, "").Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = components.AudioInputModeSelector().Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<!-- Dynamic Audio Input Container --><div id=\"audio-input-container\" class=\"mb-8\"><!-- This will be populated by JavaScript based on selected mode --></div><!-- Text to Speech Section --><div class=\"text-start\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -55,7 +59,11 @@ func MainPage() templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<div class=\"block flex flex-row pl-4 mt-4 text-sm leading-6 text-gray-600 gray-600\"><svg class=\"w-3\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" viewBox=\"0 0 47.94 47.94\"><path fill=\"currentColor\" d=\"M26.285,2.486l5.407,10.956c0.376,0.762,1.103,1.29,1.944,1.412l12.091,1.757\n\tc2.118,0.308,2.963,2.91,1.431,4.403l-8.749,8.528c-0.608,0.593-0.886,1.448-0.742,2.285l2.065,12.042\n\tc0.362,2.109-1.852,3.717-3.746,2.722l-10.814-5.685c-0.752-0.395-1.651-0.395-2.403,0l-10.814,5.685\n\tc-1.894,0.996-4.108-0.613-3.746-2.722l2.065-12.042c0.144-0.837-0.134-1.692-0.742-2.285l-8.749-8.528\n\tc-1.532-1.494-0.687-4.096,1.431-4.403l12.091-1.757c0.841-0.122,1.568-0.65,1.944-1.412l5.407-10.956\n\tC22.602,0.567,25.338,0.567,26.285,2.486z\"></path></svg><p class=\"ml-2\">At least 10 seconds of clean audio of your desired voice for best results</p></div><div class=\"block flex flex-row pl-4 mt-1 text-sm leading-6 text-gray-600 gray-600\"><svg class=\"w-3 text-gray-600\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 384 512\"><!--!Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path fill=\"currentColor\" d=\"M272 384c9.6-31.9 29.5-59.1 49.2-86.2c0 0 0 0 0 0c5.2-7.1 10.4-14.2 15.4-21.4c19.8-28.5 31.4-63 31.4-100.3C368 78.8 289.2 0 192 0S16 78.8 16 176c0 37.3 11.6 71.9 31.4 100.3c5 7.2 10.2 14.3 15.4 21.4c0 0 0 0 0 0c19.8 27.1 39.7 54.4 49.2 86.2l160 0zM192 512c44.2 0 80-35.8 80-80l0-16-160 0 0 16c0 44.2 35.8 80 80 80zM112 176c0 8.8-7.2 16-16 16s-16-7.2-16-16c0-61.9 50.1-112 112-112c8.8 0 16 7.2 16 16s-7.2 16-16 16c-44.2 0-80 35.8-80 80z\"></path></svg><p class=\"ml-2\">Might take up to 20 seconds to generate speech</p></div></div><div class=\"flex flex-col gap-y-3 gap-x-6 justify-center items-start mt-8 sm:flex-row\"><button type=\"submit\" class=\"flex-shrink-0 px-3.5 w-full h-10 text-sm font-semibold text-white bg-indigo-600 rounded-lg shadow-sm sm:w-auto hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600\">Generate Voice <span class=\"spinner htmx-indicator\" id=\"spinner\"><div class=\"inline-block ml-1 h-4 w-4 animate-spin rounded-full border-4 border-solid border-current border-e-transparent align-[-0.125em] text-surface motion-reduce:animate-[spin_1.5s_linear_infinite] dark:text-white\" role=\"status\"><span class=\"!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]\">Loading</span></div></span></button>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<!-- Tips Section --><div class=\"p-4 mt-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200\"><div class=\"flex items-start space-x-3\"><svg class=\"flex-shrink-0 mt-0.5 w-5 h-5 text-blue-500\" fill=\"currentColor\" viewBox=\"0 0 20 20\"><path fill-rule=\"evenodd\" d=\"M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z\" clip-rule=\"evenodd\"></path></svg><div class=\"text-sm text-blue-800\"><p class=\"mb-2 font-semibold\">Tips for best results:</p><ul class=\"space-y-1 text-blue-700\"><li>• Use at least 10 seconds of clean, clear audio</li><li>• Avoid background noise and music</li><li>• Single speaker works better than multiple voices</li><li>• Generation may take 20-30 seconds</li></ul></div></div></div></div><div class=\"flex flex-col justify-center items-center mt-8 space-y-4 w-full\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = components.SubmitButton().Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -63,7 +71,15 @@ func MainPage() templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</div></form></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</div></form></div><!-- Loading Animation -->")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = components.LoadingAnimation().Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "</div><script>\n\t\t\t// Alpine.js Store Setup\n\t\t\tdocument.addEventListener('alpine:init', () => {\n\t\t\t\tAlpine.store('voiceClone', {\n\t\t\t\t\t// State\n\t\t\t\t\taudioMode: 'url',\n\t\t\t\t\ttextValid: false,\n\t\t\t\t\taudioInputValid: false,\n\t\t\t\t\t\n\t\t\t\t\t// Computed\n\t\t\t\t\tget isFormValid() {\n\t\t\t\t\t\treturn this.textValid && this.audioInputValid;\n\t\t\t\t\t},\n\t\t\t\t\t\n\t\t\t\t\t// Actions\n\t\t\t\t\tsetAudioMode(mode) {\n\t\t\t\t\t\tthis.audioMode = mode;\n\t\t\t\t\t\tthis.audioInputValid = false; // Reset validation when mode changes\n\t\t\t\t\t},\n\t\t\t\t\t\n\t\t\t\t\tvalidateText(text) {\n\t\t\t\t\t\tthis.textValid = text.length > 0 && text.length <= 500;\n\t\t\t\t\t},\n\t\t\t\t\t\n\t\t\t\t\tvalidateAudioInput(isValid) {\n\t\t\t\t\t\tthis.audioInputValid = isValid;\n\t\t\t\t\t}\n\t\t\t\t});\n\t\t\t});\n\n\t\t\t// Load default URL input on page load\n\t\t\tdocument.addEventListener('DOMContentLoaded', function() {\n\t\t\t\t// Load URL input by default\n\t\t\t\thtmx.ajax('POST', '/validate-url', {target: '#audio-input-container'});\n\t\t\t});\n\n\t\t\t// Add audio mode to request parameters and debug\n\t\t\tdocument.addEventListener('htmx:configRequest', function(evt) {\n\t\t\t\tconst form = evt.detail.elt;\n\t\t\t\tif (form.id === 'voice-form') {\n\t\t\t\t\tconsole.log('HTMX request starting');\n\t\t\t\t\tconst audioMode = Alpine.store('voiceClone').audioMode;\n\t\t\t\t\tevt.detail.parameters['audio-mode'] = audioMode;\n\t\t\t\t}\n\t\t\t});\n\n\t\t\t// Debug HTMX events\n\t\t\tdocument.addEventListener('htmx:beforeRequest', function(evt) {\n\t\t\t\tconsole.log('Before request:', evt.detail);\n\t\t\t});\n\n\t\t\tdocument.addEventListener('htmx:afterRequest', function(evt) {\n\t\t\t\tconsole.log('After request:', evt.detail);\n\t\t\t});\n\t\t</script>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

@@ -1,0 +1,45 @@
+package components
+
+templ SubmitButton() {
+						<button
+							type="submit"
+							class="flex relative justify-center items-center px-8 py-3 w-full text-base font-semibold text-white bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl shadow-lg transition-all duration-200 hover:from-indigo-500 hover:to-purple-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:hover:from-indigo-600 disabled:hover:to-purple-600 disabled:shadow-none"
+							id="generate-button"
+							disabled
+						>
+						<!-- Default Icon -->
+						<svg class="mr-2 w-5 h-5 transition-opacity duration-200" id="voice-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 14.142M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/>
+						</svg>
+
+						<!-- Loading Icon -->
+						<svg class="mr-2 w-5 h-5 transition-opacity duration-200 animate-spin" id="loading-icon" fill="none" viewBox="0 0 24 24" style="display: none;">
+							<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+							<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+						</svg>
+
+						<span class="transition-opacity duration-200 generate-text">Generate Voice Clone</span>
+
+						<!-- Subtle Pulse Effect when Loading -->
+						<div class="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-xl transition-opacity duration-200 opacity-0" id="button-pulse"></div>
+					</button>
+
+					<script>
+						// Initialize Alpine.js on the submit button
+						document.addEventListener('DOMContentLoaded', function() {
+							const button = document.getElementById('generate-button');
+							if (button && typeof Alpine !== 'undefined') {
+								// Set up Alpine attributes for form validation only
+								button.setAttribute('x-data', '{}');
+								button.setAttribute('x-bind:disabled', '!$store.voiceClone.isFormValid');
+								button.setAttribute('x-bind:class', '$store.voiceClone.isFormValid ? "hover:scale-105 transform" : "opacity-60 cursor-not-allowed transform-none"');
+								
+								// Debug: Watch for store changes
+								button.setAttribute('x-effect', 'console.log("Form valid:", $store.voiceClone.isFormValid, "Text valid:", $store.voiceClone.textValid, "Audio valid:", $store.voiceClone.audioInputValid)');
+								
+								// Initialize Alpine on this element
+								Alpine.initTree(button);
+							}
+						});
+					</script>
+}
