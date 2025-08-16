@@ -212,8 +212,12 @@ templ FileUpload() {
 
 		// Notify validation system when file state changes
 		function notifyValidationSystem() {
-			if (window.validateForm) {
-				setTimeout(window.validateForm, 50);
+			// Check if we have a valid file
+			const isValid = selectedFile !== null;
+			
+			// Update Alpine.js store validation state
+			if (typeof Alpine !== 'undefined' && Alpine.store('voiceClone')) {
+				Alpine.store('voiceClone').validateAudioInput(isValid);
 			}
 		}
 	</script>
