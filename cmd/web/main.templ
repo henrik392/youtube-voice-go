@@ -65,22 +65,22 @@ templ MainPage() {
 					audioMode: 'url',
 					textValid: false,
 					audioInputValid: false,
-					
+
 					// Computed
 					get isFormValid() {
 						return this.textValid && this.audioInputValid;
 					},
-					
+
 					// Actions
 					setAudioMode(mode) {
 						this.audioMode = mode;
 						this.audioInputValid = false; // Reset validation when mode changes
 					},
-					
+
 					validateText(text) {
 						this.textValid = text.length > 0 && text.length <= 500;
 					},
-					
+
 					validateAudioInput(isValid) {
 						this.audioInputValid = isValid;
 					}

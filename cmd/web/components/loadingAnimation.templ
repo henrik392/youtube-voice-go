@@ -1,7 +1,7 @@
 package components
 
 templ LoadingAnimation() {
-	<div id="voice-generation-loading" class="htmx-indicator">
+	<div id="voice-generation-loading" class="voice-loading-indicator">
 		<div class="flex fixed inset-0 z-50 justify-center items-center bg-black bg-opacity-60 backdrop-blur-sm">
 			<div class="p-8 mx-4 max-w-sm bg-white rounded-2xl shadow-2xl" id="loading-modal">
 				<div class="text-center">
@@ -56,17 +56,13 @@ templ LoadingAnimation() {
 	</div>
 
 	<style>
-		/* HTMX indicator styles */
-		.htmx-indicator {
+		/* Voice loading indicator styles */
+		#voice-generation-loading {
 			opacity: 0;
 			pointer-events: none;
 			transition: opacity 500ms ease-in;
 		}
-		.htmx-request .htmx-indicator {
-			opacity: 1;
-			pointer-events: auto;
-		}
-		.htmx-request.htmx-indicator {
+		#voice-generation-loading.htmx-request {
 			opacity: 1;
 			pointer-events: auto;
 		}
