@@ -18,6 +18,10 @@ func (s *Server) RegisterRoutes() http.Handler {
 
 	fileServer := http.FileServer(http.FS(web.Files))
 	r.Handle("/assets/*", fileServer)
+	// Serve favicon directly for better browser compatibility
+	r.Get("/favicon.ico", func(w http.ResponseWriter, r *http.Request) {
+		http.Redirect(w, r, "/assets/images/favicon.ico", http.StatusMovedPermanently)
+	})
 	r.Get("/", templ.Handler(web.MainPage()).ServeHTTP)
 	r.Post("/validate-url", web.ValidateURLHandler)
 	r.Post("/process-video", web.ProcessVideoHandler)
@@ -25,12 +29,12 @@ func (s *Server) RegisterRoutes() http.Handler {
 	r.Post("/generate-voice-enhanced", web.GenerateVoiceEnhancedHandler)
 	r.Post("/generate-voice-optimized", web.GenerateVoiceOptimizedHandler)
 	r.Get("/serve-audio", web.ServeAudioHandler)
-	
+
 	// Component handlers for dynamic loading
 	r.Get("/components/url-input", web.URLInputHandler)
 	r.Get("/components/file-upload", web.FileUploadHandler)
 	r.Get("/components/microphone", web.MicrophoneHandler)
-	
+
 	// Audio input handlers
 	r.Post("/upload-audio", web.UploadAudioHandler)
 	r.Post("/save-recording", web.SaveRecordingHandler)
