@@ -16,8 +16,8 @@ RUN go mod download
 COPY package.json ./
 COPY package-lock.json ./
 
-# Install Node.js dependencies
-RUN npm ci --only=production
+# Install Node.js dependencies (including devDependencies for build tools)
+RUN npm ci
 
 COPY . .
 
