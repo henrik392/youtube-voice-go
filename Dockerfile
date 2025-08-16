@@ -21,7 +21,7 @@ FROM alpine:latest
 WORKDIR /app
 
 # Install yt-dlp
-RUN apk update && apk add --no-cache yt-dlp
+RUN apk update && apk add --no-cache yt-dlp ffmpeg ca-certificates
 
 RUN mkdir -p /app/downloads
 # RUN chmod 777 /app/downloads
