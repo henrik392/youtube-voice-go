@@ -1,4 +1,4 @@
-# YouTube Voice Cloner
+# Voice Cloner
 
 Transform YouTube and TikTok videos into custom AI-generated speech using Dia TTS voice synthesis technology.
 
